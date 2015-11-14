@@ -27,7 +27,7 @@ define([
             'click #pgsignin-signin'  : "_onSignin",
             'click #pgsignin-register': "_onRegister",
             'keyup'                   : "_onKeyUp",
-            'click .nav-tabs li a'    : "_hideError"
+            'click .nav-tabs li a'    : "_hideStatus"
         },
 
         // If there is no signin, then show the view.
@@ -49,7 +49,7 @@ define([
 
         _showOrHide: function() {
             if (this._options.pgPlayerModel.get('state') === 'static') {
-                this._hideError();
+                this._hideStatus();
                 this._isShowing = (this._options.pgPlayerModel.get('username') === "unknown");
                 if (this._isShowing) {
                     $(".form-signin").fadeIn(500, function() { $("#pgsignin-signin-name").focus(); });
@@ -61,7 +61,7 @@ define([
                     case 'signing-in': status = "Signing in..."; break;
                     case 'registering': status = "Registering..."; break;
                 }
-                this._onError(status);
+                this._showStatus(status);
             }
         },
 
@@ -93,15 +93,15 @@ define([
             if (this._isSigningInOrRegistering()) return;
             $('body').removeClass('pg-user-not-signed-in').addClass('pg-user-signing-in');
 
-            this._hideError();
+            this._hideStatus();
 
             var username = $("#pgsignin-signin-name").val();
             if (!username) {
-                return this._onError("Username is required!");
+                return this._showStatus("Username is required!");
             }
             var password = $("#pgsignin-signin-password").val();
             if (!password) {
-                return this._onError("Password is required!");
+                return this._showStatus("Password is required!");
             }
 
             this._signInOrRegister('signing-in', username, password);
@@ -111,33 +111,33 @@ define([
             if (this._isSigningInOrRegistering()) return;
             $('body').removeClass('pg-user-not-signed-in').addClass('pg-user-signing-in');
 
-            this._hideError();
+            this._hideStatus();
 
             var username = $("#pgsignin-register-name").val();
             if (!username) {
-                return this._onError("Username is required!");
+                return this._showStatus("Username is required!");
             }
             var password = $("#pgsignin-register-password").val();
             if (!password) {
-                return this._onError("Password is required!");
+                return this._showStatus("Password is required!");
             }
             var passwordVerify = $("#pgsignin-register-password-verify").val();
             if (!passwordVerify) {
-                return this._onError("Password verification is required!");
+                return this._showStatus("Password verification is required!");
             }
             if (passwordVerify != password) {
-                return this._onError("Passwords don't match!");
+                return this._showStatus("Passwords don't match!");
             }
 
             this._signInOrRegister('registering', username, password);
         },
 
-        _onError: function(err) {
+        _showStatus: function(err) {
             $("#pgsignin-error-message").text(err);
             $("#pgsignin-error-message").css("visibility", "visible");
         },
 
-        _hideError: function() {
+        _hideStatus: function() {
             $("#pgsignin-error-message").css('visibility', "hidden");
         },
 
@@ -147,7 +147,8 @@ define([
         },
 
         _signInOrRegister: function(state, username, password) {
-            var promise,
+            var isRegister = state === 'registering',
+                promise,
                 sModel = this._options.pgSessionModel,
                 pModel = this._options.pgPlayerModel;
 
@@ -159,7 +160,7 @@ define([
                 password: password
             });
 
-            if (state === 'registering') {
+            if (isRegister) {
                 promise = sModel.register(pModel);
             } else {
                 promise = sModel.login(pModel);
@@ -169,10 +170,12 @@ define([
                 .then(_.bind(function() {
                     pModel.set('state', 'signed-in');
                     $('body').removeClass('pg-user-signing-in').addClass('pg-user-signed-in');
+                    this._hideStatus();
                 }, this))
                 .fail(_.bind(function() {
                     pModel.set('state', 'not-signed-in');
                     $('body').removeClass('pg-user-signing-in').addClass('pg-user-not-signed-in');
+                    this._showStatus(isRegister ? "Registration failed." : "Signin failed");
                 }, this));
         }
 

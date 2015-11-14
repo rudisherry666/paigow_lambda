@@ -62,13 +62,14 @@ define([
                     dataType: 'json',
                     data: JSON.stringify(data),
                     success: _.bind(function(data) {
+                        console.log('Successful login');
                         this.SESSION_HASH = data.sessionHash;
                         document.cookie = 'pg-session-hash=' + data.sessionHash;
                         this.fetch();
                         defer.resolve();
                     }, this),
                     error: _.bind(function(data) {
-                        console.log('cannot register');
+                        console.log('login failed');
                         defer.reject();
                     }, this)
                 };
@@ -86,13 +87,14 @@ define([
                     method: 'POST',
                     contentType: 'application/json;charset=UTF-8',
                     success: _.bind(function(data) {
+                        console.log('Successful register');
                         this.SESSION_HASH = data.sessionHash;
                         document.cookie = 'pg-session-hash=' + data.sessionHash;
                         this.fetch();
                         defer.resolve();
                     }, this),
                     error: _.bind(function(data) {
-                        console.log('cannot register');
+                        console.log('register failed');
                         defer.reject();
                     }, this)
                 };
