@@ -24,9 +24,11 @@ define([
 
     function PGApp() {
         var pgGameView;
+
         function _newGame(e) {
             pgGameView.newGame(e);
         }
+
         function _onSignin(model, state) {
             var $gameView, $newGame;
             switch(state) {
@@ -45,12 +47,16 @@ define([
                     }
 
                     // Don't double-bind
-                    $newGame.unbind('click', _newGame);
-                    $newGame.bind('click', _newGame);
+                    if ($newGame) {
+                        $newGame.unbind('click', _newGame);
+                        $newGame.bind('click', _newGame);
+                    }
                 break;
 
                 case 'not-signed-in':
-                    $newGame.unbind('click', _newGame);
+                    if ($newGame) {
+                        $newGame.unbind('click', _newGame);
+                    }
                 break;
             }
         }
@@ -64,8 +70,14 @@ define([
         // the player specifics.
         var pgPlayerModel = new PGPlayerModel();
         pgPlayerModel.fetch({
-            success: function() { console.log('success'); defer.resolve(); },
-            error:   function() { console.log('error');   defer.reject();  }
+            success: function() {
+                console.log('success getting playiner');
+                defer.resolve();
+            },
+            error: function() {
+                console.log('error getting player');
+                defer.reject();
+            }
         });
 
         pgPlayerModel.on('change:state', _onSignin);
@@ -78,7 +90,7 @@ define([
 
         // Create the views that show the player's name or other attributes in
         // various parts of the UI.
-        defer.promise().done(function() {
+        defer.promise().always(function() {
 
             // The part of the nav bar where the name is shown
             var navPGPlayerNameView = new PGPlayerNameView({

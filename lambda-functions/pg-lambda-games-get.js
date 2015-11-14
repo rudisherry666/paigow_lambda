@@ -27,10 +27,16 @@ exports.handler = function(event, context) {
         }, function(err, data) {
             if (err) {
                 console.log('Error trying to find games, error: ' + JSON.stringify(err));
-                context.fail('error');
+                context.succeed( {
+                    error: 'Error trying to find games',
+                    code: 'PG_ERROR_DB_SCAN_GAMES'
+                });
             } else if (!data) {
                 console.log('No games found for user ' + player.username);
-                context.fail('error');
+                context.succeed({
+                    info: 'No games for user',
+                    code: 'PG_RESPONSE_NO_GAMES'
+                });
             } else {
                 // We found all the games that contain our username, but if there
                 // are other users whose username includes ours, they'll be
@@ -59,6 +65,6 @@ exports.handler = function(event, context) {
         });
     })
     .fail(function(err) {
-        context.fail(err);
+        context.succeed(err);
     });
 };

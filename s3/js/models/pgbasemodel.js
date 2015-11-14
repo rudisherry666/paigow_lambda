@@ -9,16 +9,11 @@
 
 define(['backbone'], function(Backbone) {
 
-    function getCookie(name) {
-        var value = "; " + document.cookie;
-        var parts = value.split("; " + name + "=");
-        if (parts.length == 2) return parts.pop().split(";").shift();
-    }
-
     var PGBaseModel = Backbone.Model.extend({
 
         // Filled in by subclass PGSessionModel.
-        SESSION_HASH: 'jfzcnrwnllfrznisffdeb',
+        // SESSION_HASH: 'jfzcnrwnllfrznisffdeb',
+        SESSION_HASH: undefined,
 
         // Subclasses just use urlPath, we set the root.
         urlRootBase: 'https://4lsjp8j9ji.execute-api.us-west-2.amazonaws.com/test',

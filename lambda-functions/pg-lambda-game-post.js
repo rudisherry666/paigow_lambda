@@ -87,6 +87,6 @@ exports.handler = function(event, context) {
     .fail(function(err) {
         // TODO: if writing some stuff failled, we have to back out.
         // i.e. make it transaction based.
-        context.fail(err);
+        context.succeed(err);
     });
 };

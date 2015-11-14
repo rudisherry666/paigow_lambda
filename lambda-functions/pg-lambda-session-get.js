@@ -21,14 +21,14 @@ exports.handler = function(event, context) {
     dynamodb = new (require('dynamodb-doc')).DynamoDB();
     validateRequest()
     .then(function() {
-        if (!event.sessionHash) return {};
+        if (!event.sessionHash) return { error: 'No session', code: 'PG_ERROR_NO_SESSION' };
         return dbUtils.getItem(dynamodb, 'session', 'sessionHash', event.sessionHash);
     })
     .then(function(session) {
         context.succeed(session);
     })
     .fail(function(err) {
-        console.log('fail');
-        context.fail(err);
+        console.log('fail, no session or could not get it');
+        context.succeed(err);
     });
 };

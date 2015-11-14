@@ -56,7 +56,12 @@ define([
                 } else
                     $(".form-signin").fadeOut(500);
             } else {
-                this._onError((this._options.pgPlayerModel.get('state') === 'signing-in') ? "Signing in..." : "Registering...");
+                var status = '';
+                switch (this._options.pgPlayerModel.get('state')) {
+                    case 'signing-in': status = "Signing in..."; break;
+                    case 'registering': status = "Registering..."; break;
+                }
+                this._onError(status);
             }
         },
 
@@ -65,7 +70,7 @@ define([
         _onKeyUp: function(e) {
             // Regardless of key, we don't do anything if it's working
             // om a signin or register.
-            if (this._options.pgPlayerModel.get('state') === 'working')
+            if (this._options.pgPlayerModel.get('state') !== 'static')
                 return;
 
             switch (e.keyCode) {
@@ -142,19 +147,31 @@ define([
         },
 
         _signInOrRegister: function(state, username, password) {
-            this._options.pgPlayerModel.set({
+            var promise,
+                sModel = this._options.pgSessionModel,
+                pModel = this._options.pgPlayerModel;
+
+            // Update the player model for signing in or registering, and
+            // make sure the buttons know not to do anything.
+            pModel.set({
                 state: state,
                 username: username,
                 password: password
             });
 
-            this._options.pgSessionModel.loginOrRegister(this._options.pgPlayerModel)
+            if (state === 'registering') {
+                promise = sModel.register(pModel);
+            } else {
+                promise = sModel.login(pModel);
+            }
+
+            promise
                 .then(_.bind(function() {
-                    this._options.pgPlayerModel.set('state', 'signed-in');
+                    pModel.set('state', 'signed-in');
                     $('body').removeClass('pg-user-signing-in').addClass('pg-user-signed-in');
                 }, this))
                 .fail(_.bind(function() {
-                    this._options.pgPlayerModel.set('state', 'not-signed-in');
+                    pModel.set('state', 'not-signed-in');
                     $('body').removeClass('pg-user-signing-in').addClass('pg-user-not-signed-in');
                 }, this));
         }

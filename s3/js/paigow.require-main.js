@@ -33,6 +33,23 @@ requirejs.config({
     }
 });
 
-define(['pgapp'], function(PGApp) {
+define(['jquery', 'pgapp'], function($, PGApp) {
+    var savedAjax = $.ajax;
+    $.ajax = function(options) {
+
+        var origSuccess = options.success || function() {};
+        options.success = function(data, textStatus, jqXHR) {
+            if (options.dataType !== 'json') {
+                origSuccess(data, textStatus, jqXHR);
+            } else if (data.error) {
+                if (options.error) options.error(data, "error", jqXHR);
+            } else {
+                origSuccess(data, textStatus, jqXHR);
+            }
+        };
+
+        return savedAjax(options);
+    };
+
     var dummyApp = new PGApp();
 });

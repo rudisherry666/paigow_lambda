@@ -48,7 +48,7 @@ exports.handler = function(event, context) {
                 // an error return, so we succeed with that info.
                 if (player.email !== event.email || player.password !== hash) {
                     console.log('Cannot re-register ' + event.username);
-                    response = { info: 'That username is already in use.  Please choose another', code: 'PG_RESPONSE_NAME_IN_USE' };
+                    response = { error: 'That username is already in use.  Please choose another', code: 'PG_ERROR_NAME_IN_USE' };
                     defer.reject(response);
                 } else {
                     console.log('Register found existing player that matches, using it');
@@ -59,7 +59,7 @@ exports.handler = function(event, context) {
                 // Logging in: just the password needs to match.
                 if (player.password !== hash) {
                     console.log('Cannot login, password does not match: ' + event.username);
-                    response = { info: 'That username/password combination does not work.  Please try again', code: 'PG_RESPONSE_INVALID_LOGIN' };
+                    response = { error: 'That username/password combination does not work.  Please try again', code: 'PG_ERROR_INVALID_LOGIN' };
                     defer.reject(response);
                 } else {
                     console.log('Login found correct player, using it');
@@ -70,7 +70,7 @@ exports.handler = function(event, context) {
         } else if (event.action === 'login') {
             // They're logging in: no player, sorry.
             console.log('Cannot login, cannot find username: ' + event.username);
-            response = { info: 'That username/password combination does not work.  Please try again', code: 'PG_RESPONSE_INVALID_LOGIN' };
+            response = { error: 'That username/password combination does not work.  Please try again', code: 'PG_ERROR_INVALID_LOGIN' };
             defer.reject(response);
 
         } else {
@@ -103,6 +103,7 @@ exports.handler = function(event, context) {
                 } else {
                     console.log('Player session no good!');
                     delete player.sessionHash;
+                    player.situation = 'LOGGED_OUT';
                     check.resolve();
                 }
             })
@@ -128,6 +129,7 @@ exports.handler = function(event, context) {
                 console.log(JSON.stringify(session));
                 dbUtils.putItem(dynamodb, 'session', session)
                 .then(function() {
+                    console.log('setting player sessionHash to ' + session.sessinHash);
                     player.sessionHash = session.sessionHash;
                     defer.resolve(player);
                 })
@@ -150,7 +152,7 @@ exports.handler = function(event, context) {
 
         player.situation = 'LOGGED_IN';
 
-        console.log('loginPlayer logging in');
+        console.log('loginPlayer logging in, sessionHash is ' + player.sessionHash);
         dynamodb.putItem({
             TableName: 'player',
             Item: player
@@ -160,7 +162,7 @@ exports.handler = function(event, context) {
             if (err) {
                 console.log('Cannot save player ' + event.username + ' logged-in state: ' + JSON.stringify(err));
                 response = { error: 'Cannot log in ' + event.username + ' due to database error', code: 'PG_ERROR_DB_PUTITEM_PLAYER' };
-                context.fail(response);
+                context.succeed(response);
                 return;
             }
 
@@ -170,7 +172,7 @@ exports.handler = function(event, context) {
 
     function loginSuccess(player) {
         console.log('loginSuccess!');
-        response = { info: 'Player ' + (event.action === "register" ? 'registered' : 'logged in'), paigow321: player.sessionHash, code: 'PG_RESPONSE_PLAYER_REGISTERED' };
+        response = { info: 'Player ' + (event.action === "register" ? 'registered' : 'logged in'), sessionHash: player.sessionHash, code: 'PG_RESPONSE_PLAYER_REGISTERED' };
         context.succeed(response);
     }
 
@@ -190,6 +192,11 @@ exports.handler = function(event, context) {
         return loginPlayer(player);
     }).fail(function(err) {
         console.log('Failed: ' + JSON.stringify(err));
-        context.fail(err);
+
+        // We always succeed, because $.ajax() will not pass along a response
+        // body for anythin except 200 unless we use JSONP.  Don't want to
+        // go through the learning curve for that.  We have a client layer
+        // on top of ajax that will translate anything with PG_ERROR in it.
+        context.succeed(err);
     });
 };
