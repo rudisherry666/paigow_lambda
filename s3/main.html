@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>PaiGow</title>
+
+        <!-- Bootstrap: Latest compiled and minified CSS -->
+        <!-- <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"> -->
+        <link rel="stylesheet" href="css/lib/bootstrap-3.3.5.css">
+        <!-- Bootstrap: Optional theme -->
+        <!-- <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css"> -->
+
+        <link rel="stylesheet" href="css/paigow.css">
+        <link href="css/pggame.css" rel="stylesheet">
+        <link href="css/pgdeal.css" rel="stylesheet">
+        <link href="css/pghand.css" rel="stylesheet">
+        <link href="css/pgtile.css" rel="stylesheet">
+        <link href="css/entypo.css" rel="stylesheet">
+    </head>
+    <body class="pg-not-signed-in">
+        <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">Pai Gow</a>
+                </div>
+                <div class="collapse navbar-collapse">
+                    <ul class="nav navbar-nav">
+                        <li><a class="pg-user-action-button" id="pg-new-game" href="javascript:void(0);">New Game</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                    <ul class="nav pull-right navbar-nav">
+                        <li id="fat-menu" class="dropdown">
+                            <a href="#" id="user-dropdown" role="button" class="dropdown-toggle" data-toggle="dropdown">
+                                <div id="pglayer-name-nav" style="display:inline-block;"></div>
+                                <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="user-dropdown">
+                                <li><a class="pg-user-action-button" tabindex="-1" href="#">Logout</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div><!--/.nav-collapse -->
+            </div>
+        </div>
+
+        <div class="container pg">
+
+            <link rel="stylesheet" href="css/pgsignin.css">
+            <div class="pg-divider"></div>
+            <div class="form-signin">
+                <h2 class="form-signin-heading">Please sign in</h2>
+                <div class="tabbable"> <!-- Only required for left/right tabs -->
+                    <ul id="pgsignin-tabs" class="nav nav-tabs">
+                        <li class="active"><a href="#login" data-toggle="tab">Sign in</a></li>
+                        <li><a href="#register" data-toggle="tab">Register</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="pgsignin-error"><span id="pgsignin-error-message" style="color:red"><strong>&nbsp;</strong></span></div>
+                        <div class="tab-pane active" id="login">
+                            <input id="pgsignin-signin-name" type="text" class="pgsignin-input input-block-level" placeholder="Username">
+                            <input id="pgsignin-signin-password" type="password" class="pgsignin-input input-block-level" placeholder="Password">
+                            <label class="checkbox">
+                                <input id="pgsignin-signin-rememberme" type="checkbox" value="remember-me"> Remember me
+                            </label>
+                            <button id="pgsignin-signin" class="btn btn-large btn-primary">Sign in</button>
+                        </div>
+                        <div class="tab-pane" id="register">
+                            <input id="pgsignin-register-name" type="text" class="pgsignin-input input-block-level" placeholder="Choose a username">
+                            <input id="pgsignin-register-password" type="password" class="pgsignin-input input-block-level" placeholder="Choose a password">
+                            <input id="pgsignin-register-password-verify" type="password" class="ipgsignin-input nput-block-level" placeholder="Verify password">
+                            <label class="checkbox">
+                                <input id="pgsignin-register-rememberme" type="checkbox" value="remember-me"> Remember me
+                            </label>
+                            <button id="pgsignin-register" class="btn btn-large btn-primary">Register</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="pg-game" class="pg-game">
+                <!-- <xx% include pgdeal %xx> -->
+            </div>
+        </div>
+
+        <script src="js/xlib/require-2.1.11.min.js" data-main="js/paigow.require-main.js"></script>
+    </body>
+</html>
+

@@ -1,0 +1,6 @@
+**/xlib/
+.DS_Store
+docs
+q.js
+test/node_modules/
+s3/view-templates/

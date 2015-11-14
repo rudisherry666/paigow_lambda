@@ -1,0 +1,56 @@
+.pghand {
+    position: relative;
+    display: block;
+    margin-bottom: 10px;
+    padding: 10px 10px 3px 10px;
+    text-align: center;
+}
+
+.pghand .pghand-tiles {
+    display: inline-block;
+    width: auto;
+}
+
+.pghand .pghand-name {
+    font-family: Helvetica,Arial;
+}
+
+.pghand .pgtile-spacer {
+    display: inline-block;
+    width: 40px;
+    height: 1px;
+}
+
+.pghand .pg2tile {
+    display: inline-block;
+    padding: 0;
+    padding-left: 10px;
+    padding-right: 10px;
+    overflow: visible;
+    text-align: center;
+}
+
+.pghand .pg2tile-label {
+    font-size: 18px;
+    font-weight: 300;
+    pointer-events: none;
+}
+
+.pg-hidden-hand .pghand .pg2tile-label {
+    visibility: hidden;
+}
+
+.pghand .rotatetiles-btn {
+    position: absolute;
+    margin-left: -25px;
+    left: 50%;
+    margin-top: -10px;
+    top: 70%;
+    font-size: 50px;
+    cursor: pointer;
+}
+
+.pg-hidden-hand .pghand .rotatetiles-btn {
+    display: none;
+}
+
