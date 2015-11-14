@@ -12,7 +12,7 @@ exports.handler = function(event, context) {
     function validateRequest() {
         var defer = q.defer();
 
-        q.resolve();
+        defer.resolve();
 
         return defer.promise;
     }
@@ -21,6 +21,14 @@ exports.handler = function(event, context) {
     dynamodb = new (require('dynamodb-doc')).DynamoDB();
     validateRequest()
     .then(function() {
-        context.succeed('xxx');
+        if (!event.sessionHash) return {};
+        return dbUtils.getItem(dynamodb, 'session', 'sessionHash', event.sessionHash);
+    })
+    .then(function(session) {
+        context.succeed(session);
+    })
+    .fail(function(err) {
+        console.log('fail');
+        context.fail(err);
     });
 };

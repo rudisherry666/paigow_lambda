@@ -12,7 +12,7 @@ exports.handler = function(event, context) {
     function validateRequest() {
         var defer = q.defer();
 
-        q.resolve();
+        defer.resolve();
 
         return defer.promise;
     }
