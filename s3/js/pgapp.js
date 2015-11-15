@@ -46,11 +46,13 @@ define([
                         }
 
                         // The part of the nav bar where the name is shown
-                        this._options.pgPlayerNameView = new PGPlayerNameView({
-                            pgPlayerModel: pModel,
-                            $el: $("#pglayer-name-nav")
-                        });
-                        this._options.pgPlayerNameView.render();
+                        if (!this._options.pgPlayerNameView) {
+                            this._options.pgPlayerNameView = new PGPlayerNameView({
+                                pgPlayerModel: pModel,
+                                $el: $("#pglayer-name-nav")
+                            });
+                            this._options.pgPlayerNameView.render();
+                        }
                     }, this),
                     error: _.bind(function() {
                         console.log('error getting player');
@@ -71,13 +73,17 @@ define([
                 }
 
                 // The sign-in view, only if we're not logged in.
-                this._options.pgSigninView = new PGSigninView({
-                    el: $(".form-signin")[0],
-                    pgPlayerModel: this._options.pgPlayerModel,
-                    pgSessionModel: this._options.pgSessionModel
-                });
-                this._options.pgSigninView.render();
+                if (!this._options.pgSigninView) {
+                    this._options.pgSigninView = new PGSigninView({
+                        el: $(".form-signin")[0],
+                        pgPlayerModel: this._options.pgPlayerModel,
+                        pgSessionModel: this._options.pgSessionModel
+                    });
+                    this._options.pgSigninView.render();
+                }
             }, this));
+
+            this._options.pgSessionModel.startSession();
 
             // Create a deck model that everyone will use.
             var pgDeckModel = new PGDeckModel();

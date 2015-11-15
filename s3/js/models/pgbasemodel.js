@@ -18,10 +18,6 @@ define(['backbone'], function(Backbone) {
 
     var PGBaseModel = Backbone.Model.extend({
 
-        // Filled in by subclass PGSessionModel.
-        // SESSION_HASH: 'jfzcnrwnllfrznisffdeb',
-        SESSION_HASH: undefined,
-
         // Subclasses just use urlPath, we set the root.
         urlRootBase: 'https://4lsjp8j9ji.execute-api.us-west-2.amazonaws.com/test',
         urlRoot: function() {
@@ -56,8 +52,15 @@ define(['backbone'], function(Backbone) {
         },
 
         setSessionHash: function(sessionHash) {
+            // For some reason the combination of lambda and API Gateway
+            // is setting the cookie to "undefined".  Ignore it.
+            if (sessionHash === "undefined") sessionHash = undefined;
             SESSION_HASH = sessionHash;
-            document.cookie = 'pg-session-hash=' + sessionHash;
+            if (SESSION_HASH) {
+                document.cookie = 'pg-session-hash=' + sessionHash;
+            } else {
+                document.cookie = 'pg-session-hash=' + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            }
         },
 
         getSessionHash: function() {

@@ -24,11 +24,6 @@ define([
             // restore the session itself.  Fetch will trigger 'sync'
             // or 'error'.
             this.initializeSessionHash();
-            if (this.getSessionHash()) {
-                this.fetch();
-            } else {
-                this.trigger('logout');
-            }
 
             this.listenTo(this, 'sync', _.bind(function(data) {
                 this.trigger('login');
@@ -42,6 +37,14 @@ define([
         },
 
         urlPath: '/session',
+
+        startSession: function() {
+            if (this.getSessionHash()) {
+                this.fetch();
+            } else {
+                this.trigger('logout');
+            }
+        },
 
         login: function(playerModel) {
             var defer = $.Deferred(),

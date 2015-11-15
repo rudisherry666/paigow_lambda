@@ -8,18 +8,23 @@
 define([
     'bootstrap',
     'backbone',
+    'models/pgsigninmodel',
     'models/pgsessionmodel',
+    'templates/pgsigninview',
     'jquery-ui'
 ], function(
     Bootstrap,
     Backbone,
-    PGSessionModel) {
+    PGSigninModel,
+    PGSessionModel,
+    template) {
     
     var PGSigninView = Backbone.View.extend({
 
         // Startup
         initialize: function(options) {
             this._options = options;
+            this._options.pgSigninModel = new PGSigninModel();
             this._addModelListeners();
         },
 
@@ -35,6 +40,9 @@ define([
             if (!this._everRendered) {
                 this._everRendered = true;
 
+                var compiled = _.template(template);
+                this.$el.append(compiled());
+
                 // Initialize the tabs
                 $("#pgsignin-tabs").tabs();
             }
@@ -44,20 +52,20 @@ define([
         // Listen for changes: show or hide the form depending on whether
         // or not there is a user (name === "unknown" is the trigger)
         _addModelListeners: function() {
-            this._options.pgPlayerModel.on("change:state", _.bind(this._showOrHide, this));
+            this._options.pgSigninModel.on("change:state", _.bind(this._showOrHide, this));
         },
 
         _showOrHide: function() {
-            if (this._options.pgPlayerModel.get('state') === 'static') {
+            if (this._options.pgSigninModel.get('state') === 'static') {
                 this._hideStatus();
-                this._isShowing = (this._options.pgPlayerModel.get('username') === "unknown");
+                this._isShowing = (this._options.pgSigninModel.get('username') === "unknown");
                 if (this._isShowing) {
                     $(".form-signin").fadeIn(500, function() { $("#pgsignin-signin-name").focus(); });
                 } else
                     $(".form-signin").fadeOut(500);
             } else {
                 var status = '';
-                switch (this._options.pgPlayerModel.get('state')) {
+                switch (this._options.pgSigninModel.get('state')) {
                     case 'signing-in': status = "Signing in..."; break;
                     case 'registering': status = "Registering..."; break;
                 }
@@ -70,7 +78,7 @@ define([
         _onKeyUp: function(e) {
             // Regardless of key, we don't do anything if it's working
             // om a signin or register.
-            if (this._options.pgPlayerModel.get('state') !== 'static')
+            if (this._options.pgSigninModel.get('state') !== 'static')
                 return;
 
             switch (e.keyCode) {
@@ -150,7 +158,7 @@ define([
             var isRegister = state === 'registering',
                 promise,
                 sModel = this._options.pgSessionModel,
-                pModel = this._options.pgPlayerModel;
+                pModel = this._options.pgSigninModel;
 
             // Update the player model for signing in or registering, and
             // make sure the buttons know not to do anything.

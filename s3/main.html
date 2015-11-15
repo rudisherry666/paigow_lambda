@@ -56,39 +56,9 @@
 
             <link rel="stylesheet" href="css/pgsignin.css">
             <div class="pg-divider"></div>
-            <div class="form-signin">
-                <h2 class="form-signin-heading">Please sign in</h2>
-                <div class="tabbable"> <!-- Only required for left/right tabs -->
-                    <ul id="pgsignin-tabs" class="nav nav-tabs">
-                        <li class="active"><a href="#login" data-toggle="tab">Sign in</a></li>
-                        <li><a href="#register" data-toggle="tab">Register</a></li>
-                    </ul>
-                    <div class="tab-content">
-                        <div class="pgsignin-error"><span id="pgsignin-error-message" style="color:red"><strong>&nbsp;</strong></span></div>
-                        <div class="tab-pane active" id="login">
-                            <input id="pgsignin-signin-name" type="text" class="pgsignin-input input-block-level" placeholder="Username">
-                            <input id="pgsignin-signin-password" type="password" class="pgsignin-input input-block-level" placeholder="Password">
-                            <label class="checkbox">
-                                <input id="pgsignin-signin-rememberme" type="checkbox" value="remember-me"> Remember me
-                            </label>
-                            <button id="pgsignin-signin" class="btn btn-large btn-primary">Sign in</button>
-                        </div>
-                        <div class="tab-pane" id="register">
-                            <input id="pgsignin-register-name" type="text" class="pgsignin-input input-block-level" placeholder="Choose a username">
-                            <input id="pgsignin-register-password" type="password" class="pgsignin-input input-block-level" placeholder="Choose a password">
-                            <input id="pgsignin-register-password-verify" type="password" class="ipgsignin-input nput-block-level" placeholder="Verify password">
-                            <label class="checkbox">
-                                <input id="pgsignin-register-rememberme" type="checkbox" value="remember-me"> Remember me
-                            </label>
-                            <button id="pgsignin-register" class="btn btn-large btn-primary">Register</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div class="form-signin"></div>
 
-            <div id="pg-game" class="pg-game">
-                <!-- <xx% include pgdeal %xx> -->
-            </div>
+            <div id="pg-game" class="pg-game"></div>
         </div>
 
         <script src="js/xlib/require-2.1.11.min.js" data-main="js/paigow.require-main.js"></script>
