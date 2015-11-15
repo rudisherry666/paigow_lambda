@@ -12,12 +12,6 @@ define([
 ], function(
     PGBaseModel
 ) {
-    
-    function getCookie(name) {
-        var value = "; " + document.cookie;
-        var parts = value.split("; " + name + "=");
-        if (parts.length == 2) return parts.pop().split(";").shift();
-    }
 
     var PGSessionModel = PGBaseModel.extend({
 
@@ -29,15 +23,15 @@ define([
             // Get the sessionHash cookie if we have it, and if we do,
             // restore the session itself.  Fetch will trigger 'sync'
             // or 'error'.
-            this.SESSION_HASH = getCookie('pg-session-hash');
-            if (this.SESSION_HASH) {
+            this.initializeSessionHash();
+            if (this.getSessionHash()) {
                 this.fetch();
             } else {
-                this.trigger('nosync');
+                this.trigger('logout');
             }
 
             this.listenTo(this, 'sync', _.bind(function(data) {
-                console.log('sync');
+                this.trigger('login');
             }, this));
         },
 
@@ -63,14 +57,15 @@ define([
                     data: JSON.stringify(data),
                     success: _.bind(function(data) {
                         console.log('Successful login');
-                        this.SESSION_HASH = data.sessionHash;
-                        document.cookie = 'pg-session-hash=' + data.sessionHash;
+                        this.setSessionHash(data.sessionHash);
+                        this.set('sessionHash', data.sessionHash);
                         this.fetch();
                         defer.resolve();
                     }, this),
                     error: _.bind(function(data) {
                         console.log('login failed');
                         defer.reject();
+                        this.trigger('logout');
                     }, this)
                 };
 
@@ -88,14 +83,15 @@ define([
                     contentType: 'application/json;charset=UTF-8',
                     success: _.bind(function(data) {
                         console.log('Successful register');
-                        this.SESSION_HASH = data.sessionHash;
-                        document.cookie = 'pg-session-hash=' + data.sessionHash;
+                        this.setSessionHash(data.sessionHash);
+                        this.set('sessionHash', data.sessionHash);
                         this.fetch();
                         defer.resolve();
                     }, this),
                     error: _.bind(function(data) {
                         console.log('register failed');
                         defer.reject();
+                        this.trigger('logout');
                     }, this)
                 };
 

@@ -9,6 +9,13 @@
 
 define(['backbone'], function(Backbone) {
 
+    var SESSION_HASH;
+    function getCookie(name) {
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length == 2) return parts.pop().split(";").shift();
+    }
+
     var PGBaseModel = Backbone.Model.extend({
 
         // Filled in by subclass PGSessionModel.
@@ -36,14 +43,26 @@ define(['backbone'], function(Backbone) {
         },
 
         addSessionHashHeader: function(options) {
-            var sessionHash = this.SESSION_HASH;
-            if (sessionHash) {
+            if (SESSION_HASH) {
                 options = options || {};
                 options.headers = options.headers || [];
-                options.headers['X-PG-Session'] = sessionHash;
+                options.headers['X-PG-Session'] = SESSION_HASH;
             }
             return options;
         },
+
+        initializeSessionHash: function() {
+            this.setSessionHash(getCookie('pg-session-hash'));
+        },
+
+        setSessionHash: function(sessionHash) {
+            SESSION_HASH = sessionHash;
+            document.cookie = 'pg-session-hash=' + sessionHash;
+        },
+
+        getSessionHash: function() {
+            return SESSION_HASH;
+        }
 
     });
 

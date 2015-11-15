@@ -51,5 +51,6 @@ define(['jquery', 'pgapp'], function($, PGApp) {
         return savedAjax(options);
     };
 
-    var dummyApp = new PGApp();
+    if (!window.PG) window.PG = {};
+    window.PG.App = new PGApp();
 });

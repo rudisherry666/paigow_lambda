@@ -22,14 +22,82 @@ define([
     PGGameModel,
     PGGameView) {
 
-    function PGApp() {
-        var pgGameView;
+    var PGApp = Backbone.View.extend({
 
-        function _newGame(e) {
+        initialize: function() {
+            this._options = {};
+
+            // Create a session model.
+            this._options.pgSessionModel = new PGSessionModel();
+
+            this.listenTo(this._options.pgSessionModel, 'login', _.bind(function() {
+
+                // Create a player model that will communicate with the server about
+                // the player specifics.
+                var pModel = this._options.pgPlayerModel = new PGPlayerModel();
+                this.listenTo(pModel, 'change:state', this._onSignin);
+                pModel.fetch({
+                    success: _.bind(function() {
+                        console.log('success getting player');
+
+                        if (this._options.pgSigninView) {
+                            this._options.pgSigninView.remove();
+                            delete this._options.pgSigninView;
+                        }
+
+                        // The part of the nav bar where the name is shown
+                        this._options.pgPlayerNameView = new PGPlayerNameView({
+                            pgPlayerModel: pModel,
+                            $el: $("#pglayer-name-nav")
+                        });
+                        this._options.pgPlayerNameView.render();
+                    }, this),
+                    error: _.bind(function() {
+                        console.log('error getting player');
+                    }, this)
+                });
+            }, this));
+
+            this.listenTo(this._options.pgSessionModel, 'logout', _.bind(function() {
+                var pModel = this._options.pgPlayerModel;
+                if (pModel) {
+                    this.stopListening(pModel);
+                    delete this._options.pgPlayerModel;
+                }
+
+                if (this._options.pgPlayerNameView) {
+                    this._options.pgPlayerNameView.remove();
+                    delete this._options.pgPlayerNameView;
+                }
+
+                // The sign-in view, only if we're not logged in.
+                this._options.pgSigninView = new PGSigninView({
+                    el: $(".form-signin")[0],
+                    pgPlayerModel: this._options.pgPlayerModel,
+                    pgSessionModel: this._options.pgSessionModel
+                });
+                this._options.pgSigninView.render();
+            }, this));
+
+            // Create a deck model that everyone will use.
+            var pgDeckModel = new PGDeckModel();
+
+            // Create a game model.  For now we don't fetch it.
+            var pgGameModel = new PGGameModel({ pgDeckModel: pgDeckModel });
+
+            // Any button on the navbar removes the collapse.
+            $(".collapse.navbar-collapse").click(function(e) {
+              $(".collapse.navbar-collapse").removeClass("in");
+            });
+
+            _.bindAll(this, '_newGame');
+        },
+
+        _newGame: function(e) {
             pgGameView.newGame(e);
-        }
+        },
 
-        function _onSignin(model, state) {
+        _onSignin: function(model, state) {
             var $gameView, $newGame;
             switch(state) {
                 case 'signed-in':
@@ -39,80 +107,29 @@ define([
                         $('.pg-game').append($gameView);
                         pgGameView = new PGGameView({
                             el: $gameView[0],
-                            pgPlayerModel: pgPlayerModel,
-                            pgDeckModel: pgDeckModel,
-                            pgGameModel: pgGameModel
+                            pgPlayerModel: this._options.pgPlayerModel,
+                            pgDeckModel: this._options.pgDeckModel,
+                            pgGameModel: this._options.pgGameModel
                         });
                         $newGame = $('#pg-new-game');
                     }
 
                     // Don't double-bind
                     if ($newGame) {
-                        $newGame.unbind('click', _newGame);
-                        $newGame.bind('click', _newGame);
+                        $newGame.unbind('click', this._newGame);
+                        $newGame.bind('click', this._newGame);
                     }
                 break;
 
                 case 'not-signed-in':
                     if ($newGame) {
-                        $newGame.unbind('click', _newGame);
+                        $newGame.unbind('click', this._newGame);
                     }
                 break;
             }
-        }
+        },
 
-        var defer = $.Deferred();
-
-        // Create a session model.
-        var pgSessionModel = new PGSessionModel();
-
-        // Create a player model that will communicate with the server about
-        // the player specifics.
-        var pgPlayerModel = new PGPlayerModel();
-        pgPlayerModel.fetch({
-            success: function() {
-                console.log('success getting playiner');
-                defer.resolve();
-            },
-            error: function() {
-                console.log('error getting player');
-                defer.reject();
-            }
-        });
-
-        pgPlayerModel.on('change:state', _onSignin);
-
-        // Create a deck model that everyone will use.
-        var pgDeckModel = new PGDeckModel();
-
-        // Create a game model.  For now we don't fetch it.
-        var pgGameModel = new PGGameModel({ pgDeckModel: pgDeckModel });
-
-        // Create the views that show the player's name or other attributes in
-        // various parts of the UI.
-        defer.promise().always(function() {
-
-            // The part of the nav bar where the name is shown
-            var navPGPlayerNameView = new PGPlayerNameView({
-                pgPlayerModel: pgPlayerModel,
-                $el: $("#pglayer-name-nav")
-            });
-            navPGPlayerNameView.render();
-
-            // Any button on the navbar removes the collapse.
-            $(".collapse.navbar-collapse").click(function(e) {
-              $(".collapse.navbar-collapse").removeClass("in");
-            });
-
-            // The sign-in view
-            var signinView = new PGSigninView({
-                el: $(".form-signin")[0],
-                pgPlayerModel: pgPlayerModel,
-                pgSessionModel: pgSessionModel
-            });
-            signinView.render();
-        });
-    }
+    });
 
     return PGApp;
 });
