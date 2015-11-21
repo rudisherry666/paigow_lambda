@@ -1,11 +1,11 @@
 define([
     'backbone',
     'templates/pggamesview',
-    'models/pggamesmodel'
+    'models/pggamescollection'
 ], function(
     Backbone,
     template,
-    PGGamesModel
+    PGGamesCollection
 ) {
     
     var PGGamesView = Backbone.View.extend({
@@ -15,7 +15,7 @@ define([
             this._options = options;
             this._addModelListeners();
 
-            this._options.pgGamesModel = new PGGamesModel();
+            this._options.pgGamesCollection = new PGGamesCollection();
         },
 
         _addModelListeners: function() {

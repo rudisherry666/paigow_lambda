@@ -22,18 +22,22 @@ function(
             this.set(this.defaults);
             this._addModelListeners();
 
-            this.set('gameHash', options.gameHash);
+            if (options.gameHash) this.set('gameHash', options.gameHash);
         },
 
         // A game is specific to a player.
         defaults: {
-            'gameHash': '',
+            'gameHash': null,
             'players': '',
             'situation': ''
         },
 
         _addModelListeners: function() {
-            this.listenTo(this, 'change:gameHash', _.bind(this.fetch, this));
+            this.listenTo(this, 'change:gameHash', _.bind(this._fetchChanged, this));
+        },
+
+        _fetchChanged: function(model, newValue) {
+            this.fetch();
         },
 
         // GameHash is the RESTful attribute in /game

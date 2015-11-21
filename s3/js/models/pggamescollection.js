@@ -1,6 +1,6 @@
 /*
 *
-* @class pggamesmodel
+* @class pggamescollection
 *
 * This file defines the pggames js class on the client
 *
@@ -9,13 +9,15 @@
 
 define([
     'backbone',
-    'models/pggameModel'
+    'models/pgmodelmixin',
+    'models/pggamemodel'
 ], function(
     Backbone,
+    PGModelMixin,
     PGGameModel
 ) {
     
-    var PGPGamesModel = Backbone.Collection.extend({
+    var PGGamesCollection = Backbone.Collection.extend({
 
         // Startup
         initialize: function() {
@@ -42,5 +44,7 @@ define([
 
     });
 
-    return PGPGamesModel;
+    PGModelMixin.mixin(PGGamesCollection.prototype, Backbone.Collection);
+
+    return PGGamesCollection;
 });
