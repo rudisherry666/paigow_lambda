@@ -22,7 +22,7 @@ define(['backbone'], function(Backbone) {
             if (!this._nameSpan) {
                 this._nameSpan = $('<span></span>');
                 this._nameSpan.html(this._options.pgPlayerModel.get('username'));
-                this._options.$el.append(this._nameSpan);
+                this.$el.append(this._nameSpan);
             }
         },
 
@@ -34,6 +34,7 @@ define(['backbone'], function(Backbone) {
                     this._nameSpan.html(this._options.pgPlayerModel.get('username'));
             }, this));
         }
+
 
 
     });

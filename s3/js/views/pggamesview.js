@@ -18,15 +18,15 @@ define([
         },
 
         _addModelListeners: function() {
-            this.listenTo(this._options.pgGamesCollection, 'add', this._gameAdded);
-            this.listenTo(this._options.pgGamesCollection, 'change', this._gameChanged);
-            this.listenTo(this._options.pgGamesCollection, 'remove', this._gameRemoved);
+            this.listenTo(this._options.pgGamesCollection, 'add', this._gameAdded)
+                .listenTo(this._options.pgGamesCollection, 'change', this._gameChanged)
+                .listenTo(this._options.pgGamesCollection, 'remove', this._gameRemoved);
         },
 
         // Add a span with the player's name
         render: function() {
             if (this.$el.children().length === 0) {
-                var compiled = _.template(template);
+                var compiled = _.template(template.games);
                 this.$el.append(compiled());
             }
         },

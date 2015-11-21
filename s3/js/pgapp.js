@@ -53,7 +53,7 @@ define([
                         if (!o.pgPlayerNameView) {
                             o.pgPlayerNameView = new PGPlayerNameView({
                                 pgPlayerModel: pModel,
-                                $el: $("#pglayer-name-nav")
+                                el: $('#pglayer-name-nav')
                             });
                             o.pgPlayerNameView.render();
                         }
@@ -61,7 +61,7 @@ define([
                         // Show the games for this player
                         if (!o.pgGamesView) {
                             o.pgGamesView = new PGGamesView({
-                                $el: $('#pg-games-view-wrapper')
+                                el: $('#pg-games-view-wrapper')
                             });
                             o.pgGamesView.render();
                         }
@@ -91,7 +91,7 @@ define([
                 // The sign-in view, only if we're not logged in.
                 if (!this._options.pgSigninView) {
                     this._options.pgSigninView = new PGSigninView({
-                        el: $(".form-signin")[0],
+                        el: $(".form-signin"),
                         pgPlayerModel: this._options.pgPlayerModel,
                         pgSessionModel: this._options.pgSessionModel
                     });
