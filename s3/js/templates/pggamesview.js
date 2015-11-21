@@ -11,7 +11,7 @@ define([], function() {
 
         game:
             '<tr class="pg-games-row-game pg-games-row-hash-<%= gameHash %>">' +
-                '<td class="pg-games-row-opponent"><%- opponent %></td>' +
+                '<td class="pg-games-row-opponent"><a href="#"><%- opponent %></a></td>' +
                 '<td class="pg-games-row-start-time"><%= startTime %></td>' +
                 '<td class="pg-games-row-score"><%= score %></td>' +
             '</tr>'

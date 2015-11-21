@@ -59,7 +59,9 @@ exports.handler = function(event, context) {
         game = {
             gameHash: utils.newRandomID(),
             players: player.username + '|' + opponent.username,
-            situation: 'CREATED'
+            situation: 'CREATED',
+            startTime: new Date().getTime(),
+            score: [0, 0]
         };
         deal = {
             'game-hash': game.gameHash,
