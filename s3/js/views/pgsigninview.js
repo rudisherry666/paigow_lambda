@@ -177,12 +177,10 @@ define([
             promise
                 .then(_.bind(function() {
                     pModel.set('state', 'signed-in');
-                    $('body').removeClass('pg-user-signing-in').addClass('pg-user-signed-in');
                     this._hideStatus();
                 }, this))
                 .fail(_.bind(function() {
                     pModel.set('state', 'not-signed-in');
-                    $('body').removeClass('pg-user-signing-in').addClass('pg-user-not-signed-in');
                     this._showStatus(isRegister ? "Registration failed." : "Signin failed");
                 }, this));
         }

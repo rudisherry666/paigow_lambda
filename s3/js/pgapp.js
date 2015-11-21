@@ -32,6 +32,8 @@ define([
 
             this.listenTo(this._options.pgSessionModel, 'login', _.bind(function() {
 
+                $('body').removeClass('pg-user-signing-in').addClass('pg-user-signed-in');
+
                 // Create a player model that will communicate with the server about
                 // the player specifics.
                 var pModel = this._options.pgPlayerModel = new PGPlayerModel();
@@ -72,6 +74,9 @@ define([
             }, this));
 
             this.listenTo(this._options.pgSessionModel, 'logout', _.bind(function() {
+
+                $('body').removeClass('pg-user-signing-in').addClass('pg-user-not-signed-in');
+
                 var pModel = this._options.pgPlayerModel;
                 if (pModel) {
                     this.stopListening(pModel);
