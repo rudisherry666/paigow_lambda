@@ -28,27 +28,31 @@ define([
             if (this.$el.children().length === 0) {
                 var compiled = _.template(template.games);
                 this.$el.append(compiled());
+
+                this.$table = this.$('.pg-games-table');
             }
         },
 
         _gameAdded: function(model, collection, options) {
-            console.log('gameAdded!');
-            console.log(model);
-            console.log(collection);
-            console.log(options);
+            var row = _.template(template.game);
+            this.$table.append(row({
+                gameHash: model.get('gameHash'),
+                opponent: model.get('players'),
+                startTime: model.get('gameHash'),
+                score: model.get('situation')
+            }));
         },
 
         _gameRemoved: function(model, collection, options) {
-            console.log('gameRemoved!');
-            console.log(model);
-            console.log(collection);
-            console.log(options);
+            var $row = this.$('.pg-games-row-hash-' + model.get('gameHash'));
+            $row.remove();
         },
 
         _gameChanged: function(model, options) {
-            console.log('gameChanged!');
-            console.log(model);
-            console.log(options);
+            var $row = this.$('.pg-games-row-hash-' + model.get('gameHash'));
+            $row.find('.pg-games-row-opponent').text(model.get('players'));
+            $row.find('.pg-games-row-start-time').text(model.get('gameHash'));
+            $row.find('.pg-games-row-score').text(model.get('situation'));
         },
 
     });
