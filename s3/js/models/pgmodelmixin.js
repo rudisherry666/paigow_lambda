@@ -24,7 +24,7 @@ define([], function(Backbone) {
                 // Subclasses just use urlPath, we set the root.
                 urlRoot: 'https://4lsjp8j9ji.execute-api.us-west-2.amazonaws.com/test',
                 url: function() {
-                    return this.urlRoot + this.urlPath;
+                    return this.urlRoot + _.result(this, 'urlPath');
                 },
 
                 // Override the various server comm to add the correct header.

@@ -21,8 +21,6 @@ define([
 
         // Startup
         initialize: function() {
-            // Assume the worst: we don't know.
-            this.set(this.defaults);
 
             // Fetch: maybe it will change.
             this.fetch();
@@ -30,12 +28,8 @@ define([
             // When we've changed an we've synced,
             // then we're static again.
             this.on('sync', function() {
-                console.log('synced!');
+                console.log('Games have been fetched!');
             });
-        },
-
-        defaults: {
-            games: []
         },
 
         model: PGGameModel,

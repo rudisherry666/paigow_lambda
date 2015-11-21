@@ -42,7 +42,9 @@ function(
 
         // GameHash is the RESTful attribute in /game
         idAttribute: 'gameHash',
-        urlPath: '/game',
+        urlPath: function() {
+            return '/game/' + this.get('gameHash');
+        },
 
     });
 

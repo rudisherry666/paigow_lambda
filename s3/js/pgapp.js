@@ -96,12 +96,6 @@ define([
 
             this._options.pgSessionModel.startSession();
 
-            // Create a deck model that everyone will use.
-            var pgDeckModel = new PGDeckModel();
-
-            // Create a game model.  For now we don't fetch it.
-            var pgGameModel = new PGGameModel({ pgDeckModel: pgDeckModel });
-
             // Any button on the navbar removes the collapse.
             $(".collapse.navbar-collapse").click(function(e) {
               $(".collapse.navbar-collapse").removeClass("in");

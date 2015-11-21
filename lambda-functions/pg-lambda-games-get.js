@@ -54,7 +54,9 @@ exports.handler = function(event, context) {
                     console.log('players:' + players);
                     if (playerFirst.test(players) || playerLast.test(players)) {
                         console.log(players + ' is valid');
-                        gameHashes.push(games[i].gameHash);
+                        gameHashes.push({
+                            gameHash: games[i].gameHash
+                        });
                     }
                 }
 
