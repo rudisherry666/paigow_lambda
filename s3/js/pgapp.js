@@ -12,7 +12,7 @@ define([
     'models/pgsessionmodel',
     'models/pgdeckmodel',
     'models/pggamemodel',
-    'views/pggameview'
+    'views/pggamesview'
 ], function(
     PGPlayerModel,
     PGPlayerNameView,
@@ -20,7 +20,7 @@ define([
     PGSessionModel,
     PGDeckModel,
     PGGameModel,
-    PGGameView) {
+    PGGamesView) {
 
     var PGApp = Backbone.View.extend({
 
@@ -38,21 +38,32 @@ define([
                 this.listenTo(pModel, 'change:state', this._onSignin);
                 pModel.fetch({
                     success: _.bind(function() {
+                        var o = this._options;
+
                         console.log('success getting player');
 
-                        if (this._options.pgSigninView) {
-                            this._options.pgSigninView.remove();
-                            delete this._options.pgSigninView;
+                        if (o.pgSigninView) {
+                            o.pgSigninView.remove();
+                            delete o.pgSigninView;
                         }
 
                         // The part of the nav bar where the name is shown
-                        if (!this._options.pgPlayerNameView) {
-                            this._options.pgPlayerNameView = new PGPlayerNameView({
+                        if (!o.pgPlayerNameView) {
+                            o.pgPlayerNameView = new PGPlayerNameView({
                                 pgPlayerModel: pModel,
                                 $el: $("#pglayer-name-nav")
                             });
-                            this._options.pgPlayerNameView.render();
+                            o.pgPlayerNameView.render();
                         }
+
+                        // Show the games for this player
+                        if (!o.pgGamesView) {
+                            o.pgGamesView = new PGGamesView({
+                                $el: $('#pg-games-view-wrapper')
+                            });
+                            o.pgGamesView.render();
+                        }
+
                     }, this),
                     error: _.bind(function() {
                         console.log('error getting player');
@@ -107,24 +118,24 @@ define([
             var $gameView, $newGame;
             switch(state) {
                 case 'signed-in':
-                    if (!pgGameView) {
-                        // The container where the game is played
-                        $gameView = $('<div class="pggame"></div>');
-                        $('.pg-game').append($gameView);
-                        pgGameView = new PGGameView({
-                            el: $gameView[0],
-                            pgPlayerModel: this._options.pgPlayerModel,
-                            pgDeckModel: this._options.pgDeckModel,
-                            pgGameModel: this._options.pgGameModel
-                        });
-                        $newGame = $('#pg-new-game');
-                    }
+                    // if (!pgGameView) {
+                    //     // The container where the game is played
+                    //     $gameView = $('<div class="pggame"></div>');
+                    //     $('.pg-game').append($gameView);
+                    //     pgGameView = new PGGameView({
+                    //         el: $gameView[0],
+                    //         pgPlayerModel: this._options.pgPlayerModel,
+                    //         pgDeckModel: this._options.pgDeckModel,
+                    //         pgGameModel: this._options.pgGameModel
+                    //     });
+                    //     $newGame = $('#pg-new-game');
+                    // }
 
-                    // Don't double-bind
-                    if ($newGame) {
-                        $newGame.unbind('click', this._newGame);
-                        $newGame.bind('click', this._newGame);
-                    }
+                    // // Don't double-bind
+                    // if ($newGame) {
+                    //     $newGame.unbind('click', this._newGame);
+                    //     $newGame.bind('click', this._newGame);
+                    // }
                 break;
 
                 case 'not-signed-in':

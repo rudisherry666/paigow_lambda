@@ -8,12 +8,12 @@
 */
 
 define([
-    'models/pgbasemodel'
+    'models/pguimodel'
 ], function(
-    PGBaseModel
+    PGUIModel
 ) {
     
-    var PGSigninModel = PGBaseModel.extend({
+    var PGUISigninModel = PGUIModel.extend({
 
         // Startup
         initialize: function() {
@@ -27,12 +27,7 @@ define([
             'state': 'static'
         },
 
-        // This is not sync'ed with the server.
-        fetch: function() {},
-        save:  function() {},
-        sync:  function() {}
-
     });
 
-    return PGSigninModel;
+    return PGUISigninModel;
 });

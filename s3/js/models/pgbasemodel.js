@@ -25,9 +25,9 @@ define(['backbone'], function(Backbone) {
         },
 
         // Override the various server comm to add the correct header.
-        fetch: function(method, model, options) {
+        fetch: function(options) {
             options = this.addSessionHashHeader(options);
-            Backbone.Model.prototype.fetch.call(this, method, model, options);
+            Backbone.Model.prototype.fetch.call(options);
         },
         sync: function(method, model, options) {
             options = this.addSessionHashHeader(options);

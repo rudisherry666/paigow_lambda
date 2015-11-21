@@ -6,18 +6,30 @@ var q = require('q'),
 exports.handler = function(event, context) {
     var response;
 
-    console.log('pg-lambda-player-get');
+    console.log('pg-lambda-game-get');
     console.log(event);
 
     function validateRequest() {
-        return dbUtils.validatePlayer(dynamodb, event.sessionHash);
+        var defer = q.defer();
+        if (!event.gameHash) {
+            defer.reject({
+                error: 'No hash supplied for getting game',
+                code: 'PG_ERROR_BAD_GAME_PARAMETER'
+            });
+        } else {
+            defer.resolve();
+        }
+        return defer.promise;
     }
 
     // Actually do the work, now that all the functions have been created.
     dynamodb = new (require('dynamodb-doc')).DynamoDB();
     validateRequest()
-    .then(function(player) {
-        context.succeed(player);
+    .then(function() {
+        return dbUtils.getItem(dynamodb, 'game', 'gameHash', event.gameHash);
+    })
+    .then(function(game) {
+        context.succeed(game);
     })
     .fail(function(err) {
         console.log('fail, no game or could not get it');
