@@ -1,6 +1,6 @@
 define([
     'backbone',
-    'templates/pggamesview',
+    'templates/pggametableview',
     'models/pggamescollection'
 ], function(
     Backbone,
