@@ -12,7 +12,7 @@ define([
     'models/pgsessionmodel',
     'models/pgdeckmodel',
     'models/pggamemodel',
-    'views/pggamesview'
+    'views/pggametableview'
 ], function(
     PGPlayerModel,
     PGPlayerNameView,
@@ -20,7 +20,7 @@ define([
     PGSessionModel,
     PGDeckModel,
     PGGameModel,
-    PGGamesView) {
+    PGGameTableView) {
 
     var PGApp = Backbone.View.extend({
 
@@ -59,12 +59,12 @@ define([
                         }
 
                         // Show the games for this player
-                        if (!o.pgGamesView) {
-                            o.pgGamesView = new PGGamesView({
+                        if (!o.pgGameTableView) {
+                            o.pgGameTableView = new PGGameTableView({
                                 el: $('#pg-games-view-wrapper'),
                                 pgSessionModel: this._options.pgSessionModel
                             });
-                            o.pgGamesView.render();
+                            o.pgGameTableView.render();
                         }
 
                     }, this),
