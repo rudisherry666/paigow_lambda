@@ -33,11 +33,19 @@ define([
         defaults: {
             'username': 'unknown',
             'password': 'unknown',
-            'state': 'static'
+            'situation': 'UNKNOWN'
         },
 
-        urlPath: '/player'
+        urlPath: '/player',
 
+        mockFetchResponse: function() {
+            return {
+                'username': 'rudi',
+                'password': '*',
+                'situation': 'LOGGED_IN',
+                'sessionHash': 'session-hash-1'
+            };
+        }
     });
 
     return PGPlayerModel;

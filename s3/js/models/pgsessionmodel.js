@@ -111,6 +111,12 @@ define([
             return defer.promise();
         },
 
+        mockFetchResponse: {
+            'sessionHash': 'session-hash-1',
+            'username': 'rudi',
+            'gameHash': 'game-hash-1'
+        },
+
     });
 
     return PGSessionModel;

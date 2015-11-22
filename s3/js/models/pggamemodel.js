@@ -8,9 +8,11 @@
 */
 
 define([
+    'utils/config',
     'models/pgbasemodel'
 ],
 function(
+    config,
     PGBaseModel
 ) {
     
@@ -67,6 +69,17 @@ function(
             playersArray = players.split('|');
             return playersArray[0] === sModel.get('username') ?
                 playersArray[1] : playersArray[0];
+        },
+
+        mockFetchResponse: function() {
+            var fetchedGame = {},
+                hash = this.get('gameHash'),
+                some = _.any(config.mockGames, function(game) {
+                    if (game.gameHash !== hash) return false;
+                    fetchedGame = game;
+                    return true;
+                });
+            return fetchedGame;
         }
 
     });

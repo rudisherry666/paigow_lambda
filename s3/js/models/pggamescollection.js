@@ -9,10 +9,12 @@
 
 define([
     'backbone',
+    'utils/config',
     'models/pgmodelmixin',
     'models/pggamemodel'
 ], function(
     Backbone,
+    config,
     PGModelMixin,
     PGGameModel
 ) {
@@ -34,7 +36,11 @@ define([
 
         model: PGGameModel,
 
-        urlPath: '/games'
+        urlPath: '/games',
+
+        mockFetchResponse: function() {
+            return _.map(config.mockGames, function(game) { return { gameHash: game.gameHash }; });
+        }
 
     });
 

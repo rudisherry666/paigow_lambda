@@ -7,11 +7,15 @@
 * A single player corresponds to a person playing the game.
 */
 
-define([], function(Backbone) {
+define([
+    'utils/config'
+], function(
+    config
+) {
 
     var SESSION_HASH;
     function getCookie(name) {
-        var value = "; " + document.cookie;
+        var value = config.mock ? config.mockCookie : ("; " + document.cookie);
         var parts = value.split("; " + name + "=");
         if (parts.length == 2) return parts.pop().split(";").shift();
     }
@@ -19,6 +23,7 @@ define([], function(Backbone) {
     return {
 
         mixin: function(obj, superclass) {
+
             _.extend(obj, {
 
                 // Subclasses just use urlPath, we set the root.
@@ -29,16 +34,41 @@ define([], function(Backbone) {
 
                 // Override the various server comm to add the correct header.
                 fetch: function(options) {
-                    options = this.addSessionHashHeader(options);
-                    superclass.prototype.fetch.call(this, options);
+                    if (config.mock) {
+                        if (this.mockFetchResponse) {
+                            _.defer(_.bind(function() {
+                                var response = _.result(this, 'mockFetchResponse');
+                                this.set(response);
+                                if (options && options.success) {
+                                    options.success(response);
+                                }
+                                this.trigger('sync', this, response, {
+                                    mock: true
+                                });
+                            }, this));
+                        } else {
+                            console.log('Mock fetch without fetch response!');
+                        }
+                    } else {
+                        options = this.addSessionHashHeader(options);
+                        superclass.prototype.fetch.call(this, options);
+                    }
                 },
                 sync: function(method, model, options) {
-                    options = this.addSessionHashHeader(options);
-                    superclass.prototype.sync.call(this, method, model, options);
+                    if (config.mock) {
+                        console.log('Mock sync -- should not be called!');
+                    } else {
+                        options = this.addSessionHashHeader(options);
+                        superclass.prototype.sync.call(this, method, model, options);
+                    }
                 },
                 save: function(method, model, options) {
-                    options = this.addSessionHashHeader(options);
-                    superclass.prototype.save.call(this, method, model, options);
+                    if (config.mock) {
+                        console.log('Mock save -- should not be called!');
+                    } else {
+                        options = this.addSessionHashHeader(options);
+                        superclass.prototype.save.call(this, method, model, options);
+                    }
                 },
 
                 addSessionHashHeader: function(options) {
