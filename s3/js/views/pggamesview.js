@@ -34,12 +34,18 @@ define([
         },
 
         _gameAdded: function(model, collection, options) {
-            var row = _.template(template.game);
+
+            // The model needs to know our session to know which
+            // player in the game is the opponent.
+            model.set('sessionModel', this._options.pgSessionModel);
+
+            // Add the row for this game.
+            row = _.template(template.game);
             this.$table.append(row({
                 gameHash: model.get('gameHash'),
-                opponent: model.get('players'),
-                startTime: this._startTime(model),
-                score: this._score(model)
+                opponent: model.opponent(),
+                startTime: model.startTime(),
+                score: model.score()
             }));
         },
 
@@ -50,20 +56,10 @@ define([
 
         _gameChanged: function(model, options) {
             var $row = this.$('.pg-games-row-hash-' + model.get('gameHash'));
-            $row.find('.pg-games-row-opponent').text(model.get('players'));
-            $row.find('.pg-games-row-start-time').text(this._startTime(model));
-            $row.find('.pg-games-row-score').text(this._score(model));
+            $row.find('.pg-games-row-opponent').text(model.opponent());
+            $row.find('.pg-games-row-start-time').text(model.startTime());
+            $row.find('.pg-games-row-score').text(model.score());
         },
-
-        _startTime: function(model) {
-            var startTime = model.get('startTime');
-            return startTime ? (new Date(startTime).toString()) : 'n/a';
-        },
-
-        _score: function(model) {
-            var score = model.get('score');
-            return (score && score.join(' - ')) || "n/a";
-        }
 
     });
 

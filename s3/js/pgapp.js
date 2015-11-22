@@ -61,7 +61,8 @@ define([
                         // Show the games for this player
                         if (!o.pgGamesView) {
                             o.pgGamesView = new PGGamesView({
-                                el: $('#pg-games-view-wrapper')
+                                el: $('#pg-games-view-wrapper'),
+                                pgSessionModel: this._options.pgSessionModel
                             });
                             o.pgGamesView.render();
                         }

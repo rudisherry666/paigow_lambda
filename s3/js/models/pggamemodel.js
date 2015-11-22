@@ -29,7 +29,9 @@ function(
         defaults: {
             'gameHash': null,
             'players': '',
-            'situation': ''
+            'situation': '',
+            'startTime': '',
+            'score': [ -1, -1 ],
         },
 
         _addModelListeners: function() {
@@ -45,6 +47,27 @@ function(
         urlPath: function() {
             return '/game/' + this.get('gameHash');
         },
+
+        // Convenience methods
+        startTime: function() {
+            var startTime = this.get('startTime');
+            return startTime ? (new Date(startTime).toString()) : 'n/a';
+        },
+
+        score: function() {
+            var score = this.get('score');
+            return (score && score.join(' - ')) || "n/a";
+        },
+
+        opponent: function() {
+            var players = this.get('players'),
+                sModel = this.get('sessionModel'),
+                playersArray;
+            if (!players || !sModel) return 'n/a';
+            playersArray = players.split('|');
+            return playersArray[0] === sModel.get('username') ?
+                playersArray[1] : playersArray[0];
+        }
 
     });
 
