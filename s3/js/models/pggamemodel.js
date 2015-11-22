@@ -80,6 +80,10 @@ function(
                     return true;
                 });
             return fetchedGame;
+        },
+
+        classID: function() {
+            return 'pg-games-row-hash-' + this.get('gameHash');
         }
 
     });

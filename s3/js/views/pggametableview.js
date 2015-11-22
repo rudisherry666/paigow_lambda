@@ -1,25 +1,27 @@
 define([
     'backbone',
     'templates/pggametableview',
-    'models/pggamescollection'
+    'models/pggamescollection',
+    'views/pggametablerowview',
 ], function(
     Backbone,
     template,
-    PGGamesCollection
+    PGGamesCollection,
+    PGGameTableRowView
 ) {
     
-    var PGGamesView = Backbone.View.extend({
+    var PGGameTableView = Backbone.View.extend({
 
         // Startup
         initialize: function(options) {
             this._options = options;
             this._options.pgGamesCollection = new PGGamesCollection();
+            this._options.views = {};
             this._addModelListeners();
         },
 
         _addModelListeners: function() {
             this.listenTo(this._options.pgGamesCollection, 'add', this._gameAdded)
-                .listenTo(this._options.pgGamesCollection, 'change', this._gameChanged)
                 .listenTo(this._options.pgGamesCollection, 'remove', this._gameRemoved);
         },
 
@@ -39,29 +41,24 @@ define([
             // player in the game is the opponent.
             model.set('sessionModel', this._options.pgSessionModel);
 
-            // Add the row for this game.
-            row = _.template(template.game);
-            this.$table.append(row({
-                gameHash: model.get('gameHash'),
-                opponent: model.opponent(),
-                startTime: model.startTime(),
-                score: model.score()
-            }));
+            var rowView = new PGGameTableRowView({
+                model: model,
+                pgGamesCollection: this._options.pgGamesCollection
+            });
+            this.$table.append(rowView.render().$el);
+            this._options.views[model.classID()] = rowView;
         },
 
         _gameRemoved: function(model, collection, options) {
-            var $row = this.$('.pg-games-row-hash-' + model.get('gameHash'));
-            $row.remove();
-        },
-
-        _gameChanged: function(model, options) {
-            var $row = this.$('.pg-games-row-hash-' + model.get('gameHash'));
-            $row.find('.pg-games-row-opponent').text(model.opponent());
-            $row.find('.pg-games-row-start-time').text(model.startTime());
-            $row.find('.pg-games-row-score').text(model.score());
+            var views = this._options.views,
+                rowView = views[model.classID()];
+            if (rowView) {
+                views.slice(views.indexOf(rowView), 1);
+                rowView.remove();
+            }
         },
 
     });
 
-    return PGGamesView;
+    return PGGameTableView;
 });

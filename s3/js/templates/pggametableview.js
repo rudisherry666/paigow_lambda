@@ -10,10 +10,8 @@ define([], function() {
             '</table>',
 
         game:
-            '<tr class="pg-games-row-game pg-games-row-hash-<%= gameHash %>">' +
-                '<td><a class="pg-games-row-opponent" href="#"><%- opponent %></a></td>' +
-                '<td><span class="pg-games-row-start-time"><%= startTime %></span></td>' +
-                '<td><span class="pg-games-row-score"><%= score %></span></td>' +
-            '</tr>'
+            '<td><a class="pg-games-row-opponent" href="#"><%- opponent %></a></td>' +
+            '<td><span class="pg-games-row-start-time"><%= startTime %></span></td>' +
+            '<td><span class="pg-games-row-score"><%= score %></span></td>',
     };
 });
