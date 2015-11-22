@@ -1,6 +1,7 @@
 define([], function() {
     return {
         games:
+            '<link rel="stylesheet" href="css/pggamestable.css">' +
             '<table class="table table-striped pg-games-table">' +
                 '<tr class="pg-games-row-header">' +
                     '<th class="pg-games-header-opponent">Opponent</th>' +
