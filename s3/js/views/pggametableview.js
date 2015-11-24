@@ -1,38 +1,38 @@
 define([
-    'backbone',
+    'views/pgbaseview',
     'templates/pggametableview',
     'models/pggamescollection',
     'views/pggametablerowview',
 ], function(
-    Backbone,
+    PGBaseView,
     template,
     PGGamesCollection,
     PGGameTableRowView
 ) {
     
-    var PGGameTableView = Backbone.View.extend({
-
-        // Startup
-        initialize: function(options) {
-            this._options = options;
-            this._options.pgGamesCollection = new PGGamesCollection();
-            this._options.views = {};
-            this._addModelListeners();
-        },
+    var PGGameTableView = PGBaseView.extend({
 
         _addModelListeners: function() {
+            this._options.pgGamesCollection = new PGGamesCollection();
             this.listenTo(this._options.pgGamesCollection, 'add', this._gameAdded)
                 .listenTo(this._options.pgGamesCollection, 'remove', this._gameRemoved);
+
+            return this._super();
         },
 
         // Add a span with the player's name
-        render: function() {
-            if (this.$el.children().length === 0) {
-                var compiled = _.template(template.games);
-                this.$el.append(compiled());
+        _addChildren: function() {
+            this._options.views = {};
+            var compiled = _.template(template.games);
+            this.$el.append(compiled());
 
-                this.$table = this.$('.pg-games-table');
-            }
+            return this._super();
+        },
+
+        _addConvenienceProperties: function() {
+            this.$table = this.$('.pg-games-table');
+
+            return this._super();
         },
 
         _gameAdded: function(model, collection, options) {
