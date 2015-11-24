@@ -21,7 +21,7 @@ define([
         },
 
         // Add a span with the player's name
-        _addChildren: function() {
+        _addChildElements: function() {
             this._options.views = {};
             var compiled = _.template(template.games);
             this.$el.append(compiled());

@@ -26,7 +26,7 @@ define([
         },
 
         // Add a span with the player's name
-        _addChildren: function() {
+        _addChildElements: function() {
             this._nameSpan = $('<span></span>');
             this._nameSpan.html(this._options.pgPlayerModel.get('username'));
             this.$el.append(this._nameSpan);

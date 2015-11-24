@@ -6,6 +6,9 @@
 */
 
 define([
+    'backbone',
+    'backbone-super',
+    'underscore',
     'models/pgplayermodel',
     'views/pgplayernameview',
     'views/pgsigninview',
@@ -14,6 +17,9 @@ define([
     'models/pggamemodel',
     'views/pggametableview'
 ], function(
+    Backbone,
+    BackboneSuper,
+    _,
     PGPlayerModel,
     PGPlayerNameView,
     PGSigninView,
@@ -61,7 +67,7 @@ define([
                         // Show the games for this player
                         if (!o.pgGameTableView) {
                             o.pgGameTableView = new PGGameTableView({
-                                el: $('#pg-games-view-wrapper'),
+                                el: $('#pg-games-table-wrapper'),
                                 pgSessionModel: this._options.pgSessionModel
                             });
                             o.pgGameTableView.render();

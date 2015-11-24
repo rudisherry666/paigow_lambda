@@ -9,9 +9,11 @@
 
 define([
     'backbone',
+    'backbone-super',
     'models/pgmodelmixin'
 ], function(
     Backbone,
+    BackboneSuper,
     PGModelMixin
 ) {
 

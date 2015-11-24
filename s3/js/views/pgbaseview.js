@@ -21,18 +21,24 @@ define([
         // Fill in the row
         render: function() {
             if (this.$el.children().length === 0) {
-                this._addChildren()._addConvenienceProperties();
+                this._addChildElements()
+                    ._addConvenienceProperties()
+                    ._renderChildren();
             }
             return this;
         },
 
-        _addChildren: function() {
+        _addChildElements: function() {
             return this;
         },
 
         _addConvenienceProperties: function() {
             return this;
         },
+
+        _renderChildren: function() {
+            return this;
+        }
 
     });
 

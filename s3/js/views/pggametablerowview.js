@@ -23,7 +23,7 @@ define([
             return this._super();
         },
 
-        _addChildren: function() {
+        _addChildElements: function() {
            var model = this._options.model,
                 row = _.template(template.game);
             this.$el.append(row({
