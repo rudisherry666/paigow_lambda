@@ -14,6 +14,10 @@ define([
         // parent view will add us to its table.
         tagName: 'tr',
 
+        events: {
+            'click .pg-games-row-start-time' : '_onClickStartTime'
+        },
+
         _addModelListeners: function() {
             this.listenTo(this._options.model, 'change', this._gameChanged);
             return this._super();
@@ -38,15 +42,16 @@ define([
             return this._super();
         },
 
-        _addGetureHandlers: function() {
-            return this._super();
-        },
-
         _gameChanged: function(model, options) {
             this.$opponent.text(model.opponent());
             this.$startTime.text(model.startTime());
             this.$score.text(model.score());
         },
+
+        _onClickStartTime: function(e) {
+            // The user has chosen an existing game.  Open it to the current
+            // deal for that game.
+        }
 
     });
 

@@ -12,7 +12,7 @@ define([], function() {
 
         game:
             '<td><a class="pg-games-row-opponent" href="#"><%- opponent %></a></td>' +
-            '<td><span class="pg-games-row-start-time"><%= startTime %></span></td>' +
+            '<td><a class="pg-games-row-start-time" href="#"><%- startTime %></a></td>' +
             '<td><span class="pg-games-row-score"><%= score %></span></td>',
     };
 });

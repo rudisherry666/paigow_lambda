@@ -21,9 +21,7 @@ define([
         // Fill in the row
         render: function() {
             if (this.$el.children().length === 0) {
-                this._addChildren()
-                    ._addConvenienceProperties()
-                    ._addGetureHandlers();
+                this._addChildren()._addConvenienceProperties();
             }
             return this;
         },
@@ -33,10 +31,6 @@ define([
         },
 
         _addConvenienceProperties: function() {
-            return this;
-        },
-
-        _addGetureHandlers: function() {
             return this;
         },
 
