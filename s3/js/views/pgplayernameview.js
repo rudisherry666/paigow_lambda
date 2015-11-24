@@ -1,30 +1,18 @@
 /*
 *
-* @class PGPlayerView
+* @class PGPlayerNameView
 *
-* This file defines the pgplayer js class on the client
+* The name of the player in the toolbar top
 *
-* A single player corresponds to a person playing the game.
 */
 
-define(['backbone'], function(Backbone) {
+define([
+    'views/PGBaseView'
+], function(
+    PGBaseView
+) {
     
-    var PGPlayerNameView = Backbone.View.extend({
-
-        // Startup
-        initialize: function(options) {
-            this._options = options;
-            this._addModelListeners();
-        },
-
-        // Add a span with the player's name
-        render: function() {
-            if (!this._nameSpan) {
-                this._nameSpan = $('<span></span>');
-                this._nameSpan.html(this._options.pgPlayerModel.get('username'));
-                this.$el.append(this._nameSpan);
-            }
-        },
+    var PGPlayerNameView = PGBaseView.extend({
 
         // Listen for changes
         _addModelListeners: function() {
@@ -33,9 +21,18 @@ define(['backbone'], function(Backbone) {
                 if (this._nameSpan)
                     this._nameSpan.html(this._options.pgPlayerModel.get('username'));
             }, this));
-        }
 
+            return this._super();
+        },
 
+        // Add a span with the player's name
+        _addChildren: function() {
+            this._nameSpan = $('<span></span>');
+            this._nameSpan.html(this._options.pgPlayerModel.get('username'));
+            this.$el.append(this._nameSpan);
+
+            return this._super();
+        },
 
     });
 
