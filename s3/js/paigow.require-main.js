@@ -34,7 +34,7 @@ requirejs.config({
     }
 });
 
-define(['jquery', 'pgapp'], function($, PGApp) {
+define(['jquery', 'pgappview'], function($, PGAppView) {
     var savedAjax = $.ajax;
     $.ajax = function(options) {
 
@@ -53,5 +53,5 @@ define(['jquery', 'pgapp'], function($, PGApp) {
     };
 
     if (!window.PG) window.PG = {};
-    window.PG.App = new PGApp({});
+    window.PG.App = new PGAppView({});
 });

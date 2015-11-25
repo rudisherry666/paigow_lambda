@@ -42,6 +42,7 @@ define([
             model.set('sessionModel', this._options.pgSessionModel);
 
             var rowView = new PGGameTableRowView({
+                eventBus: this._options.eventBus,
                 model: model,
                 pgGamesCollection: this._options.pgGamesCollection
             });

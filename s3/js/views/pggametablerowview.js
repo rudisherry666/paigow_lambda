@@ -49,8 +49,9 @@ define([
         },
 
         _onClickStartTime: function(e) {
-            // The user has chosen an existing game.  Open it to the current
-            // deal for that game.
+            this._options.eventBus.trigger('cick:game', {
+                gameModel: this.model
+            });
         }
 
     });

@@ -28,22 +28,28 @@ define([
     PGGameModel,
     PGGameTableView) {
 
-    var PGApp = Backbone.View.extend({
+    var PGAppView = Backbone.View.extend({
 
         initialize: function() {
-            this._options = {};
+            this._options = {
+                eventBus: _.extend({}, Backbone.Events)
+            };
 
             // Create a session model.
-            this._options.pgSessionModel = new PGSessionModel();
+            this._options.pgSessionModel = new PGSessionModel({
+                eventBus: this._options.eventBus
+            });
 
             this.listenTo(this._options.pgSessionModel, 'login', _.bind(function() {
 
-                $('body').removeClass('pg-user-signing-in').addClass('pg-user-signed-in');
+                $('body').removeClass('pg-user-signing-in')
+                         .addClass('pg-user-signed-in');
 
                 // Create a player model that will communicate with the server about
                 // the player specifics.
-                var pModel = this._options.pgPlayerModel = new PGPlayerModel();
-                this.listenTo(pModel, 'change:state', this._onSignin);
+                var pModel = this._options.pgPlayerModel = new PGPlayerModel({
+                    eventBus: this._options.eventBus,
+                });
                 pModel.fetch({
                     success: _.bind(function() {
                         var o = this._options;
@@ -58,8 +64,9 @@ define([
                         // The part of the nav bar where the name is shown
                         if (!o.pgPlayerNameView) {
                             o.pgPlayerNameView = new PGPlayerNameView({
+                                el: $('#pglayer-name-nav'),
+                                eventBus: this._options.eventBus,
                                 pgPlayerModel: pModel,
-                                el: $('#pglayer-name-nav')
                             });
                             o.pgPlayerNameView.render();
                         }
@@ -68,7 +75,8 @@ define([
                         if (!o.pgGameTableView) {
                             o.pgGameTableView = new PGGameTableView({
                                 el: $('#pg-games-table-wrapper'),
-                                pgSessionModel: this._options.pgSessionModel
+                                eventBus: this._options.eventBus,
+                                pgSessionModel: this._options.pgSessionModel,
                             });
                             o.pgGameTableView.render();
                         }
@@ -82,7 +90,8 @@ define([
 
             this.listenTo(this._options.pgSessionModel, 'logout', _.bind(function() {
 
-                $('body').removeClass('pg-user-signing-in').addClass('pg-user-not-signed-in');
+                $('body').removeClass('pg-user-signing-in')
+                         .addClass('pg-user-not-signed-in');
 
                 var pModel = this._options.pgPlayerModel;
                 if (pModel) {
@@ -99,8 +108,9 @@ define([
                 if (!this._options.pgSigninView) {
                     this._options.pgSigninView = new PGSigninView({
                         el: $(".form-signin"),
+                        eventBus: this._options.eventBus,
                         pgPlayerModel: this._options.pgPlayerModel,
-                        pgSessionModel: this._options.pgSessionModel
+                        pgSessionModel: this._options.pgSessionModel,
                     });
                     this._options.pgSigninView.render();
                 }
@@ -112,47 +122,9 @@ define([
             $(".collapse.navbar-collapse").click(function(e) {
               $(".collapse.navbar-collapse").removeClass("in");
             });
-
-            _.bindAll(this, '_newGame');
-        },
-
-        _newGame: function(e) {
-            pgGameView.newGame(e);
-        },
-
-        _onSignin: function(model, state) {
-            var $gameView, $newGame;
-            switch(state) {
-                case 'signed-in':
-                    // if (!pgGameView) {
-                    //     // The container where the game is played
-                    //     $gameView = $('<div class="pggame"></div>');
-                    //     $('.pg-game').append($gameView);
-                    //     pgGameView = new PGGameView({
-                    //         el: $gameView[0],
-                    //         pgPlayerModel: this._options.pgPlayerModel,
-                    //         pgDeckModel: this._options.pgDeckModel,
-                    //         pgGameModel: this._options.pgGameModel
-                    //     });
-                    //     $newGame = $('#pg-new-game');
-                    // }
-
-                    // // Don't double-bind
-                    // if ($newGame) {
-                    //     $newGame.unbind('click', this._newGame);
-                    //     $newGame.bind('click', this._newGame);
-                    // }
-                break;
-
-                case 'not-signed-in':
-                    if ($newGame) {
-                        $newGame.unbind('click', this._newGame);
-                    }
-                break;
-            }
         },
 
     });
 
-    return PGApp;
+    return PGAppView;
 });
