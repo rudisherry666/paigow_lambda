@@ -10,8 +10,13 @@ define([
         // Startup
         initialize: function(options) {
             this._options = options;
+            this._addModels();
             this._addModelListeners();
             return this;
+        },
+
+        _addModels: function() {
+
         },
 
         _addModelListeners: function() {

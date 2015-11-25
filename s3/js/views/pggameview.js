@@ -6,73 +6,75 @@
 */
 
 define([
-    'backbone',
-    'underscore',
     'classes/pgtile',
     'models/pgdealmodel',
+    'views/pgbaseview',
     'views/pgdealview'
 ], function(
-    Backbone,
-    _,
     PGTile,
     PGDealModel,
+    PGBaseView,
     PGDealView
 ) {
 
-    var PGGameView = Backbone.View.extend({
+    var PGGameView = PGBaseView.extend({
 
-        // Startup
-        initialize: function(options) {
-            this._playerModel = options.pgPlayerModel;
-            this._deckModel = options.pgDeckModel;
-            this._gameModel = options.pgGameModel;
+        _addModels: function() {
+            var o = this._options,
+                pModel = this._options.pgPlayerModel;
 
             // Initialize all the models.
-            this._playerDealModel = new PGDealModel({
-                username: this._playerModel.get('username'),
+            o.playerDealModel = new PGDealModel({
+                username: pModel.get('username'),
                 deckModel: this._deckModel
             });
-            this._computerDealModel = new PGDealModel({
-                username: this._playerModel.get('computer'),
+            o.opponentDealModel = new PGDealModel({
+                username: pModel.get('computer'),
                 deckModel: this._deckModel,
                 computer: true
             });
-
-            // Listen to the models for changes.
-            this._addModelListeners();
-        },
-
-        // If there is no signin, then show the view.
-        render: function() {
-            if (!this.renderedTemplate) {
-                this.renderedTemplate = true;
-                var $game = this.$el;
-
-                var $gameContents = $(this._gameTemplate);
-                $game.append($gameContents);
-                this._dealViews = [
-                    new PGDealView({
-                        el: $gameContents.find('.pgdeal')[0],
-                        dealModel: this._playerDealModel,
-                        deckModel: this._deckModel,
-                        gameModel: this._gameModel
-                    }),
-                    new PGDealView({
-                        el: $gameContents.find('.pgdeal')[1],
-                        dealModel: this._computerDealModel,
-                        deckModel: this._deckModel,
-                    })
-                ];
-            }
-            _.each(this._dealViews, function(dealView) { dealView.render(); });
         },
 
         // Listen for changes
         _addModelListeners: function() {
-            this._playerModel.on("change:state", _.bind(this._showOrHide, this));
-            this._playerDealModel.on("change:state", _.bind(this._handleDealState, this));
-            this._gameModel.on("change:score", _.bind(this._updateScore, this));
-            this._gameModel.on("change:state", _.bind(this._onGameStateChange, this));
+            var o = this._options;
+
+            this.listenTo(o.pgPlayerModel, 'change:state', this._showOrHide);
+            this.listenTo(o.playerDealModel, 'change:state', this._handleDealState);
+
+            this.listenTo(o.pgGameModel, 'change:score', this._updateScore);
+            this.listenTo(o.pgGameModel, 'change:state', this._onGameStateChange);
+
+            return this._super();
+        },
+
+        // If there is no signin, then show the view.
+        _addChildElements: function() {
+            var o = this._options,
+                $game = this.$el;
+
+            var $gameContents = $(this._gameTemplate);
+            $game.append($gameContents);
+            this._dealViews = [
+                new PGDealView({
+                    el: $gameContents.find('.pgdeal')[0],
+                    dealModel: o.playerDealModel,
+                    gameModel: o.gameModel
+                }),
+                new PGDealView({
+                    el: $gameContents.find('.pgdeal')[1],
+                    dealModel: o.opponentDealModel,
+                    deckModel: o.deckModel,
+                })
+            ];
+
+            return this._super();
+        },
+
+        _renderChildren: function() {
+            _.each(this._dealViews, function(dealView) { dealView.render(); });
+
+            return this._super();
         },
 
         _showOrHide: function() {
@@ -137,7 +139,7 @@ define([
 
             // Order the three hands (sets)
             this._dealViews[1].orderSets();
-            this._computerDealModel.set('state', 'previewing');
+            this._opponentDealModel.set('state', 'previewing');
         },
 
         _handleDealState: function() {
@@ -165,7 +167,7 @@ define([
                     var $scoreNums = this.$el.find('.pg-handpoints');
                     var $hands = this.$el.find('.pghand');
                     var playerHands = this._playerDealModel.get('handmodels');
-                    var computerHands = this._computerDealModel.get('handmodels');
+                    var computerHands = this._opponentDealModel.get('handmodels');
                     for (var hi = 0; hi < 3; hi++) {
                         var points = 3 - hi;
                         var playerIndex = hi;
