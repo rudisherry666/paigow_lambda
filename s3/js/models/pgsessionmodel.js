@@ -25,9 +25,15 @@ define([
             // or 'error'.
             this.initializeSessionHash();
 
-            this.listenTo(this, 'sync', _.bind(function(data) {
-                this.trigger('login');
-            }, this));
+            this.listenTo(this, 'sync', function(data) {
+                this.get('eventBus').trigger('login');
+            });
+
+            this.listenTo(this, 'error', function(data) {
+                this.get('eventBus').trigger('logout');
+            });
+
+            return this._super();
         },
 
         defaults: {
@@ -42,7 +48,7 @@ define([
             if (this.getSessionHash()) {
                 this.fetch();
             } else {
-                this.trigger('logout');
+                this.get('eventBus').trigger('logout');
             }
         },
 
@@ -68,7 +74,7 @@ define([
                     error: _.bind(function(data) {
                         console.log('login failed');
                         defer.reject();
-                        this.trigger('logout');
+                        // this.get('eventBus').trigger('logout');
                     }, this)
                 };
 
@@ -94,7 +100,7 @@ define([
                     error: _.bind(function(data) {
                         console.log('register failed');
                         defer.reject();
-                        this.trigger('logout');
+                        // this.get('eventBus').trigger('logout');
                     }, this)
                 };
 
