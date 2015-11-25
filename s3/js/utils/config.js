@@ -19,28 +19,28 @@ define([], function() {
                 players: 'rudi|jen',
                 score: [ -1, -1 ],
                 startTime: 1441756078910,
-                lastDeal: 0
+                lastDealIndex: 0
             },
             {
                 gameHash: 'game-hash-3',
                 players: 'dave|rudi',
                 score: [ 2, 7 ],
                 startTime: 1431656078910,
-                lastDeal: 5
+                lastDealIndex: 5
             },
             {
                 gameHash: 'game-hash-2',
                 players: 'computer|rudi',
                 score: [ 20, 6 ],
                 startTime: 1421556078910,
-                lastDeal: 9
+                lastDealIndex: 9
             },
             {
                 gameHash: 'game-hash-1',
                 players: 'rudi|dave',
                 score: [ 3, 7 ],
                 startTime: 1411356078910,
-                lastDeal: 3
+                lastDealIndex: 3
             },
         ],
 

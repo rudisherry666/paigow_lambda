@@ -18,30 +18,6 @@ function(
     
     var PGDealModel = PGBaseModel.extend({
 
-        // Startup
-        initialize: function(options) {
-            this.set(this.defaults);
-            // this._deckModel = options.deckModel;
-
-            // Create the three handmodels underlying this dealModel.
-            // var handOptions = { deckModel: options.deckModel };
-            // this.set('handmodels', [
-            //     new PGHandModel(handOptions),
-            //     new PGHandModel(handOptions),
-            //     new PGHandModel(handOptions)
-            // ]);
-
-            this._addModelListeners();
-
-            // if (options.computer) {
-            //     _.each(this.get('handmodels'), function(model) {
-            //         model.on('change:tiles', function() {
-            //             model.orderTiles();
-            //         });
-            //     });
-            // }
-        },
-
         defaults: {
             'dealID': null
         },

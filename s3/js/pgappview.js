@@ -127,25 +127,30 @@ define([
                 o.pgSigninView = new PGSigninView({
                     el: $(".form-signin"),
                     eventBus: o.eventBus,
-                    pgPlayerModel: o.pgPlayerModel,
                     pgSessionModel: o.pgSessionModel,
+                    pgPlayerModel: o.pgPlayerModel,
                 });
                 o.pgSigninView.render();
             }
         },
 
         _resumeGame: function(e) {
+            var o = this._options;
 
             // This will make the table disappear.
             $('body').addClass('pg-game-in-progress');
 
-            // // Put the game into view
-            // this.gameView = new PGGameView({
-            //     el: this.$("#pg-game-view-wrapper"),
-            //     eventBus: this._options.eventBus,
-            //     pgGameModel: e.gameModel,
-            //     pgPlayerModel: this._options.pgPlayerModel
-            // });
+            // Put the game into view
+            o.pgGameView = new PGGameView({
+                el: $("#pg-game-view-wrapper"),
+                eventBus: o.eventBus,
+                pgSessionModel: o.pgSessionModel,
+                pgPlayerModel: o.pgPlayerModel,
+                pgGameModel: e.pgGameModel,
+                dealIndex: e.pgGameModel.get('lastDealIndex'),
+            });
+
+            o.pgGameView.render();
         }
     });
 

@@ -9,39 +9,32 @@ define([
     'classes/pgtile',
     'models/pgdealmodel',
     'views/pgbaseview',
-    'views/pgdealview'
+    'views/pgdealview',
+    'templates/pggameview'
 ], function(
     PGTile,
     PGDealModel,
     PGBaseView,
-    PGDealView
+    PGDealView,
+    template
 ) {
 
     var PGGameView = PGBaseView.extend({
 
         _addModels: function() {
-            var o = this._options,
-                pModel = this._options.pgPlayerModel;
+            var o = this._options;
 
-            // Initialize all the models.
-            o.playerDealModel = new PGDealModel({
-                username: pModel.get('username'),
-                deckModel: this._deckModel
-            });
-            o.opponentDealModel = new PGDealModel({
-                username: pModel.get('computer'),
-                deckModel: this._deckModel,
-                computer: true
-            });
+            o.pgDealModel = new PGDealModel({ eventBus: o.eventBus });
+
+            return this._super();
         },
 
         // Listen for changes
         _addModelListeners: function() {
             var o = this._options;
 
-            this.listenTo(o.pgPlayerModel, 'change:state', this._showOrHide);
-            this.listenTo(o.playerDealModel, 'change:state', this._handleDealState);
-
+            this.listenTo(o.pgDealModel, 'sync', this._showOrHide);
+            // this.listenTo(o.playerDealModel, 'change:state', this._handleDealState);
             this.listenTo(o.pgGameModel, 'change:score', this._updateScore);
             this.listenTo(o.pgGameModel, 'change:state', this._onGameStateChange);
 
@@ -51,37 +44,46 @@ define([
         // If there is no signin, then show the view.
         _addChildElements: function() {
             var o = this._options,
-                $game = this.$el;
+                $game = this.$el,
+                compiled = _.template(template.game),
+                oDeal = _.pick(o, 'eventBus', 'pgSessionModel',
+                                  'pgGameModel', 'pgDealModel');
 
-            var $gameContents = $(this._gameTemplate);
-            $game.append($gameContents);
+            this.$el.append(compiled());
+
             this._dealViews = [
-                new PGDealView({
-                    el: $gameContents.find('.pgdeal')[0],
-                    dealModel: o.playerDealModel,
-                    gameModel: o.gameModel
-                }),
-                new PGDealView({
-                    el: $gameContents.find('.pgdeal')[1],
-                    dealModel: o.opponentDealModel,
-                    deckModel: o.deckModel,
-                })
+                new PGDealView(_.extend({
+                    el: this.$('.pg-deal-player'),
+                    username: o.pgSessionModel.get('username'),
+                    isPlayer: true,
+                }, oDeal)),
+                new PGDealView(_.extend({
+                    el: this.$('.pg-deal-opponent'),
+                    username: o.pgGameModel.opponent(),
+                    isPlayer: false,
+                }, oDeal)),
             ];
 
             return this._super();
         },
 
         _renderChildren: function() {
+            var o = this._options;
+
+            // This will cause the deal to fetch, and then trigger 'sync'
+            // will cause 
+            o.pgDealModel.set('dealID',
+                o.pgGameModel.get('gameHash') + '#' + o.dealIndex);
             _.each(this._dealViews, function(dealView) { dealView.render(); });
 
             return this._super();
         },
 
         _showOrHide: function() {
-            if ((this._playerModel.get('state') === 'static') && (this._playerModel.get('username') !== "unknown")) {
-            } else {
-                this.$el.finish().fadeOut(500);
-            }
+            // if ((this._playerModel.get('state') === 'static') && (this._playerModel.get('username') !== "unknown")) {
+            // } else {
+            //     this.$el.finish().fadeOut(500);
+            // }
         },
 
         newGame: function() {
