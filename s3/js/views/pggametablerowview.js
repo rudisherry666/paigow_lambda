@@ -49,7 +49,7 @@ define([
         },
 
         _onClickStartTime: function(e) {
-            this._options.eventBus.trigger('cick:game', {
+            this._options.eventBus.trigger('click:game', {
                 gameModel: this.model
             });
         }

@@ -34,7 +34,19 @@ requirejs.config({
     }
 });
 
-define(['jquery', 'pgappview'], function($, PGAppView) {
+define([
+    'jquery',
+    'backbone',
+    'backbone-super',
+    'underscore',
+    'pgappview'
+], function(
+    $,
+    Backbone,
+    BackboneSuper,
+    _,
+    PGAppView
+) {
     var savedAjax = $.ajax;
     $.ajax = function(options) {
 

@@ -6,36 +6,33 @@
 */
 
 define([
-    'backbone',
-    'backbone-super',
-    'underscore',
     'models/pgplayermodel',
     'views/pgplayernameview',
     'views/pgsigninview',
     'models/pgsessionmodel',
     'models/pgdeckmodel',
     'models/pggamemodel',
-    'views/pggametableview'
+    'views/pggametableview',
+    'views/pggameview'
 ], function(
-    Backbone,
-    BackboneSuper,
-    _,
     PGPlayerModel,
     PGPlayerNameView,
     PGSigninView,
     PGSessionModel,
     PGDeckModel,
     PGGameModel,
-    PGGameTableView) {
+    PGGameTableView,
+    PGGameView
+) {
 
     var PGAppView = Backbone.View.extend({
 
         initialize: function() {
             // Create/remember the event bus and session model.
-            var eventBus = _.extend({}, Backbone.Events);
+            var eBus = _.extend({}, Backbone.Events);
             this._options = {
-                eventBus: eventBus,
-                pgSessionModel: new PGSessionModel({ eventBus: eventBus })
+                eventBus: eBus,
+                pgSessionModel: new PGSessionModel({ eventBus: eBus })
             };
 
             this._addModelListeners();
@@ -45,8 +42,10 @@ define([
         },
 
         _addModelListeners: function() {
-            this.listenTo(this._options.eventBus, 'login', this._login);
-            this.listenTo(this._options.eventBus, 'logout', this._logout);
+            var eBus = this._options.eventBus;
+            this.listenTo(eBus, 'login', this._login);
+            this.listenTo(eBus, 'logout', this._logout);
+            this.listenTo(eBus, 'click:game', this._resumeGame);
 
             // Any button on the navbar removes the collapse.
             $(".collapse.navbar-collapse").click(function(e) {
@@ -102,33 +101,52 @@ define([
         },
 
         _logout: function() {
+            var o = this._options;
+
             $('body').removeClass('pg-user-signing-in')
                      .addClass('pg-user-not-signed-in');
 
-            var pModel = this._options.pgPlayerModel;
+            var pModel = o.pgPlayerModel;
             if (pModel) {
                 this.stopListening(pModel);
-                delete this._options.pgPlayerModel;
+                delete o.pgPlayerModel;
             }
 
-            if (this._options.pgPlayerNameView) {
-                this._options.pgPlayerNameView.remove();
-                delete this._options.pgPlayerNameView;
+            if (o.pgPlayerNameView) {
+                o.pgPlayerNameView.remove();
+                delete o.pgPlayerNameView;
+            }
+
+            if (o.pgGameTableView) {
+                o.pgGameTableView.remove();
+                delete o.pgGameTableView;
             }
 
             // The sign-in view, only if we're not logged in.
-            if (!this._options.pgSigninView) {
-                this._options.pgSigninView = new PGSigninView({
+            if (!o.pgSigninView) {
+                o.pgSigninView = new PGSigninView({
                     el: $(".form-signin"),
-                    eventBus: this._options.eventBus,
-                    pgPlayerModel: this._options.pgPlayerModel,
-                    pgSessionModel: this._options.pgSessionModel,
+                    eventBus: o.eventBus,
+                    pgPlayerModel: o.pgPlayerModel,
+                    pgSessionModel: o.pgSessionModel,
                 });
-                this._options.pgSigninView.render();
+                o.pgSigninView.render();
             }
         },
 
+        _resumeGame: function(e) {
 
+            // This will make the table disappear.
+            $('body').addClass('pg-game-in-progress');
+
+            // // Put the game into view
+            // this.gameView = new PGGameView({
+            //     el: this.$("#pg-game-view-wrapper"),
+            //     eventBus: this._options.eventBus,
+            //     pgGameModel: e.gameModel,
+            //     pgPlayerModel: this._options.pgPlayerModel
+            // });
+        }
     });
 
     return PGAppView;
