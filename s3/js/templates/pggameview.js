@@ -10,16 +10,42 @@ define([], function() {
 
         deal:
             '<div class="pgdeal-hands">' +
-                '<div class="pghand pg-hand-1"></div>' +
-                '<div class="pghand pg-hand-2"></div>' +
-                '<div class="pghand pg-hand-3"></div>' +
+                '<div class="pg-deal-buttons">' +
+                    '<div><button type="button" class="pg-deal-preview-hands btn btn-primary btn-sm">Preview Hands</button></div>' +
+                    '<div><button type="button" class="pg-deal-tiles-are-set btn btn-primary btn-sm">Tiles are Set</button></div>' +
+                '</div>' +
+                '<div class="pg-deal-hands">' +
+                    '<span class="pg-handpoints pg-handpoints-3">3</span>' +
+                    '<div id="pghand-0" class="pghand"></div>' +
+                    '<span class="pg-handpoints pg-handpoints-2">2</span>' +
+                    '<div id="pghand-1" class="pghand"></div>' +
+                    '<span data-handindex="0" class="pg-tile-manipulate-control pgtexticon pgswitchhands-btn pgswitchhands-0-btn">&#59215;</span>' +
+                    '<span class="pg-handpoints pg-handpoints-1">1</span>' +
+                    '<div id="pghand-2" class="pghand"></div>' +
+                    '<span data-handindex="1" class="pg-tile-manipulate-control pgtexticon pgswitchhands-btn pgswitchhands-1-btn">&#59215;</span>' +
+                '</div>' +
             '</div>' +
             '<span class="pgicon">&#128257;</span>',
 
         hand:
-            '<div class="pghand-tiles"></div>' +
-                '<div class="pgtile <%= tileClass %>"></div>' +
-            '<div class="pghand-name"><%= handName %></div>',
+            '<div class="pghand-tiles">' +
+                '<span class="pg-tile-manipulate-control pgtexticon rotatetiles-btn">&#10226;</span>' +
+                '<div class="pg2tile">' +
+                    '<div>' +
+                        '<div class="pgtile"></div>' +
+                        '<div class="pgtile"></div>' +
+                    '</div>' +
+                    '<span class="pg2tile-label"></span>' +
+                '</div>' +
+                '<div class="pgtile-spacer"></div>' +
+                '<div class="pg2tile">' +
+                    '<div>' +
+                        '<div class="pgtile"></div>' +
+                        '<div class="pgtile"></div>' +
+                    '</div>' +
+                    '<span class="pg2tile-label"></span>' +
+                '</div>' +
+            '</div>',
 
         tile:
             '<div class="pgdot pgdot-1"></div>' +

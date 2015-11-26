@@ -7,7 +7,7 @@
 */
 
 define([
-    'views/PGBaseView'
+    'views/pgbaseview'
 ], function(
     PGBaseView
 ) {

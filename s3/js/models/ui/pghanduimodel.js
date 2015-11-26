@@ -17,24 +17,23 @@ define([
     PGStrategy
 ) {
     
-    var PGHandModel = Backbone.Model.extend({
+    var PGHandUIModel = Backbone.Model.extend({
 
         // Startup
         initialize: function(options) {
             this._deckModel = options.deckModel;
-            this.set(this.defaults);
 
-            this._addModelListeners();
+            // // Get all the tile indexes.  These don't change, but when the
+            // // deck is shuffled we re-get the tile at that index.
+            // var tileIndexes = [];
+            // for (var ti = 0; ti < 4; ti++)
+            //     tileIndexes.push(this._deckModel.nextTileIndex());
 
-            // Get all the tile indexes.  These don't change, but when the
-            // deck is shuffled we re-get the tile at that index.
-            var tileIndexes = [];
-            for (var ti = 0; ti < 4; ti++)
-                tileIndexes.push(this._deckModel.nextTileIndex());
+            // // Set the indexes but during initialization we don't want
+            // // to trigger anything: that happens when the deck is washed.
+            // this.set('tile_indexes', tileIndexes, {silent: true});
 
-            // Set the indexes but during initialization we don't want
-            // to trigger anything: that happens when the deck is washed.
-            this.set('tile_indexes', tileIndexes, {silent: true});
+            return this._super();
         },
 
         // A hand is specific to a player in a game, and is
@@ -44,16 +43,16 @@ define([
             'points': 0
         },
 
-        urlRoot: '/hand',
-
         _addModelListeners: function() {
-            // If the deck is changed, our tiles should be re-initialized.
-            this._deckModel.on('change:deck',
-                _.bind(function() { this._resetTiles(); }, this));
+            // // If the deck is changed, our tiles should be re-initialized.
+            // this._deckModel.on('change:deck',
+            //     _.bind(function() { this._resetTiles(); }, this));
 
-            // If tile indexes are changed, reset the tiles
-            this.on('change:tile_indexes',
-                _.bind(function() { this._resetTiles(); }, this));
+            // // If tile indexes are changed, reset the tiles
+            // this.on('change:tile_indexes',
+            //     _.bind(function() { this._resetTiles(); }, this));
+
+            return this._super();
         },
 
         _resetTiles: function() {
@@ -140,5 +139,5 @@ define([
 
     });
 
-    return PGHandModel;
+    return PGHandUIModel;
 });

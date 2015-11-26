@@ -6,17 +6,15 @@
 */
 
 define([
-    'classes/pgtile',
-    'models/pghandmodel',
-    'models/ui/pgdealuimodel',
     'views/pgbaseview',
-    'views/pghandview'
+    'models/ui/pgdealuimodel',
+    'views/pghandview',
+    'templates/pggameview'
 ], function(
-    PGTile,
-    PGHandModel,
-    PGUIDealModel,
     PGBaseView,
-    PGHandView
+    PGDealUIModel,
+    PGHandView,
+    template
 ) {
     
     var PGDealView = PGBaseView.extend({
@@ -33,31 +31,31 @@ define([
                 pgDealModel: this.pgDealModel,
                 isPlayer: o.isPlayer
             });
+
+            return this._super();
         },
 
         // If there is no signin, then show the view.
         _addChildElements: function() {
-            var $deal = this.$el;
+            var o = this._options;
 
-            // Get the contents of the deal from the template.
-            var $hands = $(this._dealTemplate);
-            $deal.append($hands);
+            this.$el.append(_.template(template.deal)({}));
 
             // There are three hands, each with a model.
-            this._handViews = [];
+            o.pgHandViews = [];
             for (var hvi = 0; hvi < 3; hvi++) {
-                this._handViews.push(new PGHandView({
-                    el: $deal.find('.pghand')[hvi],
-                    handModel: o.pgDealModel.get('handmodels')[hvi],
-                    index: hvi
+                o.pgHandViews.push(new PGHandView({
+                    el: this.$('.pghand')[hvi],
+                    eventBus: o.eventBus,
+                    index: hvi,
                 }));
             }
 
-            // The 'events' was parsed before we created our view; this call
-            // reparse it to get the views we just created.
-            this.delegateEvents();
+            _.each(o.pgHandViews, function(handView) {
+                handView.render();
+            });
 
-            _.each(this._handViews, function(handView) { handView.render(); });
+            return this._super();
         },
 
         // Listen for changes
@@ -66,24 +64,24 @@ define([
 
             // If the state changes as a result of clicking one of the buttons,
             // update the state of the buttons.
-            o.pgDealModel.on('change:state',
+            o.pgDealUIModel.on('change:state',
                 _.bind(function() {
-                    switch (o.pgDealModel.get('state')) {
+                    switch (o.pgDealUIModel.get('state')) {
                         case "thinking":
-                            o.pgDealModel.get('handmodels').forEach(function(handModel) {
+                            o.pgDealUIModel.get('handmodels').forEach(function(handModel) {
                                 handModel.unpreviewTiles();
                             });
-                            this.$el.find(".pg-deal-preview-hands").text("Preview Hands");
-                            this.$el.find('.pg-deal-preview-hands').removeAttr('disabled');
-                            this.$el.find('.pg-deal-tiles-are-set').attr('disabled', true);
+                            this.$(".pg-deal-preview-hands").text("Preview Hands");
+                            this.$('.pg-deal-preview-hands').removeAttr('disabled');
+                            this.$('.pg-deal-tiles-are-set').attr('disabled', true);
                             this.$el.removeClass('pg-no-manipulate');
                         break;
                         case "previewing":
-                            o.pgDealModel.get('handmodels').forEach(function(handModel) {
+                            o.pgDealUIModel.get('handmodels').forEach(function(handModel) {
                                 handModel.previewTiles();
                             });
-                            this.$el.find(".pg-deal-preview-hands").text("Reconsider");
-                            this.$el.find('.pg-deal-tiles-are-set').removeAttr('disabled');
+                            this.$(".pg-deal-preview-hands").text("Reconsider");
+                            this.$('.pg-deal-tiles-are-set').removeAttr('disabled');
                             this.$el.addClass('pg-no-manipulate');
                         break;
                     }
@@ -91,24 +89,26 @@ define([
             );
 
             // If any of the handmodel states change, make sure we're in "thinking".
-            o.pgDealModel.get('handmodels').forEach(
-                _.bind(function(handModel) {
-                    handModel.on('change:tiles',
-                        _.bind(function() {
-                            o.pgDealModel.set('state', "thinking");
-                        }, this)
+            // TODO: use event bus?
+            _.each(o.pgHandViews, _.bind(function(pgHandView) {
+                    this.listenTo(pgHandView.model, 'change:tiles',
+                        function() {
+                            o.pgDealUIModel.set('state', "thinking");
+                        }
                     );
                 }, this)
             );
 
-            if (this._gameModel) {
-                this._gameModel.on("change:state", _.bind(function() { this._handleGameState(); }, this));
-            }
+            // if (this._gameModel) {
+            //     this._gameModel.on("change:state", _.bind(function() { this._handleGameState(); }, this))
+            // }
+
+            return this._super();
         },
 
 
         orderSets: function() {
-            var handModels = o.pgDealModel.get('handmodels');
+            var handModels = o.pgDealUIModel.get('handmodels');
             var sets = [
                 handModels[0].pgSet(),
                 handModels[1].pgSet(),
@@ -138,7 +138,7 @@ define([
         },
 
         _switchHandsEx: function(whichHand) {
-            var handModels = o.pgDealModel.get('handmodels');
+            var handModels = o.pgDealUIModel.get('handmodels');
             var modelOne = handModels[whichHand];
             var modelTwo = handModels[whichHand+1];
             var tilesOne = modelOne.get('tile_indexes');
@@ -147,32 +147,16 @@ define([
             modelTwo.set('tile_indexes', tilesOne);
         },
 
-        _dealTemplate:
-            '<div class="pg-deal-buttons">' +
-                '<div><button type="button" class="pg-deal-preview-hands btn btn-primary btn-sm">Preview Hands</button></div>' +
-                '<div><button type="button" class="pg-deal-tiles-are-set btn btn-primary btn-sm">Tiles are Set</button></div>' +
-            '</div>' +
-            '<div class="pg-deal-hands">' +
-                '<span class="pg-handpoints pg-handpoints-3">3</span>' +
-                '<div id="pghand-0" class="pghand"></div>' +
-                '<span class="pg-handpoints pg-handpoints-2">2</span>' +
-                '<div id="pghand-1" class="pghand"></div>' +
-                '<span data-handindex="0" class="pg-tile-manipulate-control pgtexticon pgswitchhands-btn pgswitchhands-0-btn">&#59215;</span>' +
-                '<span class="pg-handpoints pg-handpoints-1">1</span>' +
-                '<div id="pghand-2" class="pghand"></div>' +
-                '<span data-handindex="1" class="pg-tile-manipulate-control pgtexticon pgswitchhands-btn pgswitchhands-1-btn">&#59215;</span>' +
-            '</div>',
-
         _previewHands: function(e) {
             // Double-duty: next-deal or preview-hands
             var gameState = this._gameModel.get('state');
             if (gameState === "ready_for_next_deal") {
-                o.pgDealModel.get('handmodels').forEach(function(handModel) {
+                o.pgDealUIModel.get('handmodels').forEach(function(handModel) {
                     handModel.unpreviewTiles();
                 });
                 this._gameModel.set('state', "new_deal_asked_for");
             } else {
-                var newState = o.pgDealModel.get('state');
+                var newState = o.pgDealUIModel.get('state');
                 switch(newState) {
                     case "thinking":    // going to 'previewing'
                         newState = "previewing";
@@ -181,12 +165,12 @@ define([
                         newState = "thinking";
                     break;
                 }
-                o.pgDealModel.set('state', newState);
+                o.pgDealUIModel.set('state', newState);
             }
         },
 
         _tilesAreSet: function(e) {
-             o.pgDealModel.set('state', 'finished_setting_tiles');
+             o.pgDealUIModel.set('state', 'finished_setting_tiles');
         },
 
         _handleGameState: function() {
@@ -194,17 +178,17 @@ define([
             switch (this._gameModel.get('state')) {
                 case "ready_for_next_deal":
                     $handsButton.text("Next Deal");
-                    this.$el.find('.pg-deal-preview-hands').removeAttr('disabled');
+                    this.$('.pg-deal-preview-hands').removeAttr('disabled');
                 break;
 
                 case "just_dealt":
                     $handsButton.text("Preview Hands");
                     $(".pg-deal-tiles-are-set").attr('disabled', true);
-                    o.pgDealModel.set('state', "thinking");
+                    o.pgDealUIModel.set('state', "thinking");
                 break;
 
                 case "scoring":
-                    this.$el.find('.pg-deal-buttons button').attr('disabled', true);
+                    this.$('.pg-deal-buttons button').attr('disabled', true);
                     this.$el.addClass('pg-no-manipulate');
                 break;
 

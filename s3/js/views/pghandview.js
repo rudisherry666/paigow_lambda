@@ -6,29 +6,29 @@
 */
 
 define([
-    'backbone',
-    'classes/pghand',
-    'utils/pgbrowserutils'
+    'views/pgbaseview',
+    'models/ui/pghanduimodel',
+    'views/pgtileview',
+    'templates/pggameview'
 ], function(
-    Backbone,
-    PGHand,
-    PGBrowserUtils
+    PGBaseView,
+    PGHandUIModel,
+    PGTileView,
+    template
 ) {
     
-    var PGHandView = Backbone.View.extend({
+    var PGHandView = PGBaseView.extend({
 
-        // Startup
-        initialize: function(options) {
-            // View-based stuff.
-            this._options = options;
+        _addModels: function() {
+            var o = this._options;
 
-            this._index = options.index;
+            o.pgHandUIModel = new PGHandUIModel({
+                pgDealModel: o.pgDealModel,
+                isPlayer: o.isPlayer,
+                index: o.index,
+            });
 
-            // Initialize all the models.
-            this._handModel = options.handModel;
-
-            // Listen for changes in the models.
-            this._addModelListeners();
+            return this._super();
         },
 
         events: {
@@ -36,31 +36,43 @@ define([
         },
 
         // Show our view when asked.
-        render: function() {
-            if (!this.renderedTemplate) {
-                this.renderedTemplate = true;
+        _addChildElements: function() {
+            var o = this._options;
 
-                // We're given the hand div.
-                this._$hand = this.$el;
+            this.$el.append(_.template(template.hand)({
+                handName: 'handName',
+                tileClass1: 'tileClass1',
+                tileClass2: 'tileClass2',
+                tileClass3: 'tileClass3',
+                tileClass4: 'tileClass4',
+            }));
 
-                // Create the overall hand from the templat.
-                var $handTiles = $(this._handTemplate);
-                this._$hand.append($handTiles);
-
-                // The 'events' was parsed before we created our view; this call
-                // reparse it to get the views we just created.
-                this.delegateEvents();
+            // There are four tiles.
+            o.pgTileViews = [];
+            for (var tvi = 0; tvi < 3; tvi++) {
+                o.pgTileViews.push(new PGTileView({
+                    el: this.$('.pghand')[tvi],
+                    eventBus: o.eventBus,
+                    index: tvi,
+                }));
             }
+
+            _.each(o.pgTileViews, function(tileView) {
+                tileView.render();
+            });
+
+            return this._super();
         },
 
         // Listen for changes
         _addModelListeners: function() {
-            this._handModel.on("change:tiles",
-                _.bind(function(e) { this._tilesChanged(); }, this));
-            this._handModel.on("hand:previewed",
-                _.bind(function(e) { this._previewHand(); }, this));
-            this._handModel.on("hand:unpreviewed",
-                _.bind(function(e) { this._unpreviewHand(); }, this));
+            var o = this._options;
+
+            this.listenTo(o, 'change:tiles', this._tilesChanged);
+            this.listenTo(o, 'hand:previewed', this._previewHand);
+            this.listenTo(o, 'hand:unpreviewed', this._unpreviewHand);
+
+            return this._super();
         },
 
         _tilesChanged: function() {
@@ -100,110 +112,6 @@ define([
             var twoTile = this._$hand.find('.pg2tile>div')[1];
             PGBrowserUtils.animateRotate($(twoTile), 90, 0);
         },
-
-        _handTemplate:
-            '<div class="pghand-tiles">' +
-                '<span class="pg-tile-manipulate-control pgtexticon rotatetiles-btn">&#10226;</span>' +
-                '<div class="pg2tile">' +
-                    '<div>' +
-                        '<div class="pgtile">' +
-                            '<div class="pgdot pgdot-1"></div>' +
-                            '<div class="pgdot pgdot-2"></div>' +
-                            '<div class="pgdot pgdot-3"></div>' +
-                            '<div class="pgdot pgdot-4"></div>' +
-                            '<div class="pgdot pgdot-5"></div>' +
-                            '<div class="pgdot pgdot-6"></div>' +
-                            '<div class="pgdot pgdot-7"></div>' +
-                            '<div class="pgdot pgdot-8"></div>' +
-                            '<div class="pgdot pgdot-9"></div>' +
-                            '<div class="pgdot pgdot-10"></div>' +
-                            '<div class="pgdot pgdot-11"></div>' +
-                            '<div class="pgdot pgdot-12"></div>' +
-                            '<div class="pgdot pgdot-13"></div>' +
-                            '<div class="pgdot pgdot-14"></div>' +
-                            '<div class="pgdot pgdot-15"></div>' +
-                            '<div class="pgdot pgdot-16"></div>' +
-                            '<div class="pgdot pgdot-17"></div>' +
-                            '<div class="pgdot pgdot-18"></div>' +
-                            '<div class="pgdot pgdot-19"></div>' +
-                            '<div class="pgdot pgdot-20"></div>' +
-                        '</div>' +
-                        '<div class="pgtile">' +
-                            '<div class="pgdot pgdot-1"></div>' +
-                            '<div class="pgdot pgdot-2"></div>' +
-                            '<div class="pgdot pgdot-3"></div>' +
-                            '<div class="pgdot pgdot-4"></div>' +
-                            '<div class="pgdot pgdot-5"></div>' +
-                            '<div class="pgdot pgdot-6"></div>' +
-                            '<div class="pgdot pgdot-7"></div>' +
-                            '<div class="pgdot pgdot-8"></div>' +
-                            '<div class="pgdot pgdot-9"></div>' +
-                            '<div class="pgdot pgdot-10"></div>' +
-                            '<div class="pgdot pgdot-11"></div>' +
-                            '<div class="pgdot pgdot-12"></div>' +
-                            '<div class="pgdot pgdot-13"></div>' +
-                            '<div class="pgdot pgdot-14"></div>' +
-                            '<div class="pgdot pgdot-15"></div>' +
-                            '<div class="pgdot pgdot-16"></div>' +
-                            '<div class="pgdot pgdot-17"></div>' +
-                            '<div class="pgdot pgdot-18"></div>' +
-                            '<div class="pgdot pgdot-19"></div>' +
-                            '<div class="pgdot pgdot-20"></div>' +
-                        '</div>' +
-                    '</div>' +
-                    '<span class="pg2tile-label"></span>' +
-                '</div>' +
-                '<div class="pgtile-spacer"></div>' +
-                '<div class="pg2tile">' +
-                    '<div>' +
-                        '<div class="pgtile">' +
-                            '<div class="pgdot pgdot-1"></div>' +
-                            '<div class="pgdot pgdot-2"></div>' +
-                            '<div class="pgdot pgdot-3"></div>' +
-                            '<div class="pgdot pgdot-4"></div>' +
-                            '<div class="pgdot pgdot-5"></div>' +
-                            '<div class="pgdot pgdot-6"></div>' +
-                            '<div class="pgdot pgdot-7"></div>' +
-                            '<div class="pgdot pgdot-8"></div>' +
-                            '<div class="pgdot pgdot-9"></div>' +
-                            '<div class="pgdot pgdot-10"></div>' +
-                            '<div class="pgdot pgdot-11"></div>' +
-                            '<div class="pgdot pgdot-12"></div>' +
-                            '<div class="pgdot pgdot-13"></div>' +
-                            '<div class="pgdot pgdot-14"></div>' +
-                            '<div class="pgdot pgdot-15"></div>' +
-                            '<div class="pgdot pgdot-16"></div>' +
-                            '<div class="pgdot pgdot-17"></div>' +
-                            '<div class="pgdot pgdot-18"></div>' +
-                            '<div class="pgdot pgdot-19"></div>' +
-                            '<div class="pgdot pgdot-20"></div>' +
-                        '</div>' +
-                        '<div class="pgtile">' +
-                            '<div class="pgdot pgdot-1"></div>' +
-                            '<div class="pgdot pgdot-2"></div>' +
-                            '<div class="pgdot pgdot-3"></div>' +
-                            '<div class="pgdot pgdot-4"></div>' +
-                            '<div class="pgdot pgdot-5"></div>' +
-                            '<div class="pgdot pgdot-6"></div>' +
-                            '<div class="pgdot pgdot-7"></div>' +
-                            '<div class="pgdot pgdot-8"></div>' +
-                            '<div class="pgdot pgdot-9"></div>' +
-                            '<div class="pgdot pgdot-10"></div>' +
-                            '<div class="pgdot pgdot-11"></div>' +
-                            '<div class="pgdot pgdot-12"></div>' +
-                            '<div class="pgdot pgdot-13"></div>' +
-                            '<div class="pgdot pgdot-14"></div>' +
-                            '<div class="pgdot pgdot-15"></div>' +
-                            '<div class="pgdot pgdot-16"></div>' +
-                            '<div class="pgdot pgdot-17"></div>' +
-                            '<div class="pgdot pgdot-18"></div>' +
-                            '<div class="pgdot pgdot-19"></div>' +
-                            '<div class="pgdot pgdot-20"></div>' +
-                        '</div>' +
-                    '</div>' +
-                    '<span class="pg2tile-label"></span>' +
-                '</div>' +
-            '</div>'
 
     });
 

@@ -7,13 +7,11 @@
 
 define([
     'utils/config',
-    'models/pgbasemodel',
-    'models/pghandmodel'
+    'models/pgbasemodel'
 ],
 function(
     config,
-    PGBaseModel,
-    PGHandModel
+    PGBaseModel
 ) {
     
     var PGDealModel = PGBaseModel.extend({
