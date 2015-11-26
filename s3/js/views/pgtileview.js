@@ -47,6 +47,7 @@ define([
             var o = this._options,
                 dModel = o.pgDealModel,
                 indexInTilesOfDeal = (o.handIndex * 4) + o.dealTileIndex;
+            if (!o.isPlayer) indexInTilesOfDeal += 12;
             return dModel.get('tiles')[indexInTilesOfDeal];
         },
 
