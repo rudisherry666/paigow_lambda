@@ -51,7 +51,7 @@ define([
             o.pgTileViews = [];
             for (var tvi = 0; tvi < 3; tvi++) {
                 o.pgTileViews.push(new PGTileView({
-                    el: this.$('.pghand')[tvi],
+                    el: this.$('.pgtile')[tvi],
                     eventBus: o.eventBus,
                     index: tvi,
                 }));
