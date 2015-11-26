@@ -1,10 +1,9 @@
 /*
 *
-* @class pgplayermodel
+* @class PGDealUIModel
 *
-* This file defines the pgplayer js class on the client
+* The state of the UI for a single deal.
 *
-* A single player corresponds to a person playing the game.
 */
 
 define([
@@ -14,6 +13,9 @@ define([
 ) {
     
     var PGDealUIModel = PGUIModel.extend({
+
+        // Convenience functions
+
 
     });
 

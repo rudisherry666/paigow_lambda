@@ -45,7 +45,7 @@ define([], function() {
         ],
 
         mockDeals: {
-            'game-hash-1#0' : {
+            'game-hash-4#0' : {
                 dealID: 'game-hash-1#0',
                 situation: 'TILES_NOT_SET',
                 points: [ -1, -1 ],

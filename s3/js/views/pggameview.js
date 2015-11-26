@@ -33,7 +33,8 @@ define([
         _addModelListeners: function() {
             var o = this._options;
 
-            this.listenTo(o.pgDealModel, 'sync', this._showOrHide);
+            this.listenTo(o.pgDealModel, 'sync', this._show);
+
             // this.listenTo(o.playerDealModel, 'change:state', this._handleDealState);
             this.listenTo(o.pgGameModel, 'change:score', this._updateScore);
             this.listenTo(o.pgGameModel, 'change:state', this._onGameStateChange);
@@ -74,12 +75,13 @@ define([
             // will cause 
             o.pgDealModel.set('dealID',
                 o.pgGameModel.get('gameHash') + '#' + o.dealIndex);
-            _.each(this._dealViews, function(dealView) { dealView.render(); });
 
             return this._super();
         },
 
-        _showOrHide: function() {
+        _show: function() {
+            _.each(this._dealViews, function(dealView) { dealView.render(); });
+
             // if ((this._playerModel.get('state') === 'static') && (this._playerModel.get('username') !== "unknown")) {
             // } else {
             //     this.$el.finish().fadeOut(500);

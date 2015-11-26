@@ -17,7 +17,18 @@ define([
     PGModelMixin
 ) {
 
-    var PGBaseModel = Backbone.Model.extend({});
+    var PGBaseModel = Backbone.Model.extend({
+
+        initialize: function(options) {
+            this._super(options);
+
+            this._addModelListeners();
+        },
+
+        _addModelListeners: function() {},
+
+    });
+
     PGModelMixin.mixin(PGBaseModel.prototype, Backbone.Model);
 
     return PGBaseModel;

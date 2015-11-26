@@ -42,9 +42,13 @@ function(
             return this.get('dealID').split('#')[1];
         },
 
+        tileOfIndex: function(index) {
+            return this.get('tiles')[index];
+        },
+
         // Mock values
         mockFetchResponse: function() {
-            return config.deals[this.get('dealID')];
+            return config.mockDeals[this.get('dealID')];
         }
 
     });

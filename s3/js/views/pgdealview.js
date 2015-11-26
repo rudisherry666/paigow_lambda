@@ -28,8 +28,7 @@ define([
         _addModels: function() {
             var o = this._options;
             o.pgDealUIModel = new PGDealUIModel({
-                pgDealModel: this.pgDealModel,
-                isPlayer: o.isPlayer
+                pgDealModel: this.pgDealModel
             });
 
             return this._super();
@@ -47,7 +46,10 @@ define([
                 o.pgHandViews.push(new PGHandView({
                     el: this.$('.pghand')[hvi],
                     eventBus: o.eventBus,
-                    index: hvi,
+                    pgDealModel: o.pgDealModel,
+                    pgDealView: o.pgDealView,
+                    isPlayer: o.isPlayer,
+                    handIndex: hvi,
                 }));
             }
 

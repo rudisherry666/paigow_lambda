@@ -23,9 +23,7 @@ define([
             var o = this._options;
 
             o.pgHandUIModel = new PGHandUIModel({
-                pgDealModel: o.pgDealModel,
-                isPlayer: o.isPlayer,
-                index: o.index,
+                handIndex: o.handIndex,
             });
 
             return this._super();
@@ -53,7 +51,10 @@ define([
                 o.pgTileViews.push(new PGTileView({
                     el: this.$('.pgtile')[tvi],
                     eventBus: o.eventBus,
-                    index: tvi,
+                    pgDealModel: o.pgDealModel,
+                    isPlayer: o.isPlayer,
+                    handIndex: o.handIndex,
+                    tileIndex: tvi,
                 }));
             }
 
