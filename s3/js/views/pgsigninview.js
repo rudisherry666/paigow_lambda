@@ -8,7 +8,7 @@
 define([
     'bootstrap',
     'backbone',
-    'models/pguisigninmodel',
+    'models/ui/pguisigninmodel',
     'models/pgsessionmodel',
     'templates/pgsigninview',
     'jquery-ui'

@@ -13,6 +13,12 @@ define([
     
     var PGUIModel = Backbone.Model.extend({
 
+        initialize: function() {
+            this.set(this.defaults);
+        },
+
+        defaults: {},
+
         // This is not sync'ed with the server.
         fetch: function() {},
         save:  function() {},

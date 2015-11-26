@@ -8,18 +8,12 @@
 */
 
 define([
-    'models/pguimodel'
+    'models/ui/pguimodel'
 ], function(
     PGUIModel
 ) {
     
     var PGUISigninModel = PGUIModel.extend({
-
-        // Startup
-        initialize: function() {
-            // Assume the worst: we don't know.
-            this.set(this.defaults);
-        },
 
         defaults: {
             'username': 'unknown',
