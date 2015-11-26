@@ -36,7 +36,6 @@ define([
         // Show our view when asked.
         _addChildElements: function() {
             var o = this._options,
-                tiles = [],
                 tileIndexes = [];
 
             this.$el.append(_.template(template.hand)({
@@ -52,7 +51,7 @@ define([
                     pgDealModel: o.pgDealModel,
                     isPlayer: o.isPlayer,
                     handIndex: o.handIndex,
-                    tileIndex: tvi,
+                    dealTileIndex: tvi,
                 });
                 o.pgTileViews.push(pgTileView);
             }
@@ -60,12 +59,10 @@ define([
             _.each(o.pgTileViews, function(pgTileView) {
                 pgTileView.render();
                 tileIndexes.push(pgTileView.tileIndex());
-                tiles.push(pgTileView.tile());
             });
 
             o.pgHandUIModel.set({
-                tileIndexes: tileIndexes,
-                tiles: tiles
+                tileIndexes: tileIndexes
             }, { silent: true });
 
             return this._super();
@@ -94,8 +91,6 @@ define([
                 var tile = (tiles && tiles[ti]) || null;
                 var divClass = (tile && tile.divClass()) || "";
                 var $tile = $($tiles[ti]);
-                $tile.removeClass();
-                $tile.addClass('pgtile pgtile-' + h.get('handIndex') + '-' + ti + ' ' + divClass);
             }
 
             // Update the label.
@@ -106,15 +101,22 @@ define([
             $($labels[1]).text(lowHand.name());
         },
 
+        _rotatedArray: function(a) {
+            return new Array(a[0], a[2], a[3], a[1]);
+        },
+
         _rotateTiles: function(e) {
             var o = this._options,
-                h = o.pgHandUIModel;
+                h = o.pgHandUIModel,
+                tileIndexes = this._rotatedArray(h.get('tileIndexes'));
 
-            // Switch around our hand's tiles: third tile goes second,
-            // fourth goes third, second goes fourth.
-            var tileIndexes = h.get('tileIndexes');
-            h.set('tileIndexes', [ tileIndexes[0], tileIndexes[2], tileIndexes[3], tileIndexes[1] ]);
-            this._tilesChanged();
+            // Switch around our hand's tiles; we have to switch
+            // the views array and their DOM elements.
+            h.set('tileIndexes', tileIndexes);
+            _.each(o.pgTileViews, function(pgTileView, index) {
+                pgTileView.setTileIndex(tileIndexes[index]);
+            });
+            // this._tilesChanged();
         },
 
         _previewHand: function() {
