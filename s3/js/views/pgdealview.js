@@ -8,11 +8,13 @@
 define([
     'classes/pgtile',
     'models/pghandmodel',
+    'models/ui/pgdealuimodel',
     'views/pgbaseview',
     'views/pghandview'
 ], function(
     PGTile,
     PGHandModel,
+    PGUIDealModel,
     PGBaseView,
     PGHandView
 ) {

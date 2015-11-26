@@ -13,7 +13,7 @@ define([
     PGUIModel
 ) {
     
-    var PGUISigninModel = PGUIModel.extend({
+    var PGSigninUIModel = PGUIModel.extend({
 
         defaults: {
             'username': 'unknown',
@@ -23,5 +23,5 @@ define([
 
     });
 
-    return PGUISigninModel;
+    return PGSigninUIModel;
 });
