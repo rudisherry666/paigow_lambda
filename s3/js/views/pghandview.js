@@ -29,6 +29,18 @@ define([
             return this._super();
         },
 
+        // Listen for changes
+        _addModelListeners: function() {
+            var o = this._options,
+                h = o.pgHandUIModel;
+
+            this.listenTo(h, 'change:tileIndexes', this._tilesChanged);
+            this.listenTo(h, 'hand:previewed', this._previewHand);
+            this.listenTo(h, 'hand:unpreviewed', this._unpreviewHand);
+
+            return this._super();
+        },
+
         events: {
             'click .rotatetiles-btn': "_rotateTiles"
         },
@@ -61,42 +73,20 @@ define([
                 tileIndexes.push(pgTileView.tileIndex());
             });
 
-            o.pgHandUIModel.set({
-                tileIndexes: tileIndexes
-            }, { silent: true });
-
-            return this._super();
-        },
-
-        // Listen for changes
-        _addModelListeners: function() {
-            var o = this._options,
-                h = o.pgHandUIModel;
-
-            this.listenTo(h, 'change:tiles', this._tilesChanged);
-            this.listenTo(h, 'hand:previewed', this._previewHand);
-            this.listenTo(h, 'hand:unpreviewed', this._unpreviewHand);
+            o.pgHandUIModel.set('tileIndexes', tileIndexes);
 
             return this._super();
         },
 
         _tilesChanged: function() {
-            var o = this._options,
-                h = o.pgHandUIModel;
-
-            // Change the tile classes.
-            var $tiles = this.$('.pgtile');
-            var tiles = h.get('tiles');
-            for (var ti = 0; ti < 4; ti++) {
-                var tile = (tiles && tiles[ti]) || null;
-                var divClass = (tile && tile.divClass()) || "";
-                var $tile = $($tiles[ti]);
-            }
-
-            // Update the label.
-            var $labels = this.$('.pg2tile-label');
-            var highHand = new PGHand(tiles[0], tiles[1]);
-            var lowHand = new PGHand(tiles[2], tiles[3]);
+            // Update the label by figuring out the hand names.
+            var highHand = new PGHand(
+                    this.tileIndexOfTile(0),
+                    this.tileIndexOfTile(1)),
+                lowHand = new PGHand(
+                    this.tileIndexOfTile(2),
+                    this.tileIndexOfTile(3)),
+                $labels = this.$('.pg2tile-label');
             $($labels[0]).text(highHand.name());
             $($labels[1]).text(lowHand.name());
         },
@@ -116,7 +106,7 @@ define([
             _.each(o.pgTileViews, function(pgTileView, index) {
                 pgTileView.setTileIndex(tileIndexes[index]);
             });
-            // this._tilesChanged();
+            this._tilesChanged();
         },
 
         _previewHand: function() {
@@ -128,6 +118,10 @@ define([
             var twoTile = this.$('.pg2tile>div')[1];
             PGBrowserUtils.animateRotate($(twoTile), 90, 0);
         },
+
+        tileIndexOfTile: function(index) {
+            return this._options.pgTileViews[index].tileIndex();
+        }
 
     });
 
