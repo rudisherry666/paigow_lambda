@@ -30,6 +30,22 @@ define([
             return this._super();
         },
 
+        // Convenience methods
+        _origTileIndex: function() {
+            var o = this._options,
+                dModel = o.pgDealModel,
+                indexInTilesOfDeal = (o.handIndex * 4) + o.dealTileIndex;
+            if (!o.isPlayer) indexInTilesOfDeal += 12;
+            return dModel.get('tiles')[indexInTilesOfDeal];
+        },
+
+        // -------------------------------------------------------
+        // Exported methods
+
+        tileIndex: function() {
+            return this._options.tileIndex;
+        },
+
         setTileIndex: function(tileIndex) {
             var o = this._options,
                 tile = new PGTile(tileIndex);
@@ -41,19 +57,6 @@ define([
                     'pgtile-' + o.handIndex + '-' + o.dealTileIndex + ' ' +
                     tile.divClass());
         },
-
-        // Convenience methods
-        _origTileIndex: function() {
-            var o = this._options,
-                dModel = o.pgDealModel,
-                indexInTilesOfDeal = (o.handIndex * 4) + o.dealTileIndex;
-            if (!o.isPlayer) indexInTilesOfDeal += 12;
-            return dModel.get('tiles')[indexInTilesOfDeal];
-        },
-
-        tileIndex: function() {
-            return this._options.tileIndex;
-        }
 
     });
 

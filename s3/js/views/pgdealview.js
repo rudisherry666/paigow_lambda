@@ -53,8 +53,9 @@ define([
                 }));
             }
 
-            _.each(o.pgHandViews, function(handView) {
-                handView.render();
+            _.each(o.pgHandViews, function(pgHandView) {
+                o.pgHandViews.push(pgHandView);
+                pgHandView.render();
             });
 
             return this._super();
@@ -66,43 +67,19 @@ define([
 
             // If the state changes as a result of clicking one of the buttons,
             // update the state of the buttons.
-            o.pgDealUIModel.on('change:state',
-                _.bind(function() {
-                    switch (o.pgDealUIModel.get('state')) {
-                        case "thinking":
-                            o.pgDealUIModel.get('handmodels').forEach(function(handModel) {
-                                handModel.unpreviewTiles();
-                            });
-                            this.$(".pg-deal-preview-hands").text("Preview Hands");
-                            this.$('.pg-deal-preview-hands').removeAttr('disabled');
-                            this.$('.pg-deal-tiles-are-set').attr('disabled', true);
-                            this.$el.removeClass('pg-no-manipulate');
-                        break;
-                        case "previewing":
-                            o.pgDealUIModel.get('handmodels').forEach(function(handModel) {
-                                handModel.previewTiles();
-                            });
-                            this.$(".pg-deal-preview-hands").text("Reconsider");
-                            this.$('.pg-deal-tiles-are-set').removeAttr('disabled');
-                            this.$el.addClass('pg-no-manipulate');
-                        break;
-                    }
-                }, this)
-            );
+            this.listenTo(o.pgDealUIModel, 'change:state',
+                this._onDealStateChange);
 
-            // If any of the handmodel states change, make sure we're in "thinking".
-            // TODO: use event bus?
+            // If any of the handmodel states change, make sure we're i
+            // "thinking".  TODO: use event bus?
             _.each(o.pgHandViews, _.bind(function(pgHandView) {
-                    this.listenTo(pgHandView.model, 'change:tiles',
-                        function() {
-                            o.pgDealUIModel.set('state', "thinking");
-                        }
-                    );
+                this.listenTo(pgHandView.model, 'change:tiles',
+                    this._onHandStateChange);
                 }, this)
             );
 
             // if (this._gameModel) {
-            //     this._gameModel.on("change:state", _.bind(function() { this._handleGameState(); }, this))
+            //     this._gameModel.on("change:state", _.bind(function() { this._onGameStateChange(); }, this))
             // }
 
             return this._super();
@@ -140,18 +117,18 @@ define([
         },
 
         _switchHandsEx: function(whichHand) {
-            var handModels = o.pgDealUIModel.get('handmodels');
-            var modelOne = handModels[whichHand];
-            var modelTwo = handModels[whichHand+1];
-            var tilesOne = modelOne.get('tile_indexes');
-            var tilesTwo = modelTwo.get('tile_indexes');
-            modelOne.set('tile_indexes', tilesTwo);
-            modelTwo.set('tile_indexes', tilesOne);
+            var o = this._options,
+                hv = o.pgHandViews,
+                ti1 = hv[whichHand].tileIndexes(),
+                ti2 = hv[whichHand+1].tileIndexes();
+            hv[whichHand].setTileIndexes(ti2);
+            hv[whichHand+1].setTileIndexes(ti1);
         },
 
         _previewHands: function(e) {
             // Double-duty: next-deal or preview-hands
-            var gameState = this._gameModel.get('state');
+            var o = this._options,
+                gameState = this._gameModel.get('state');
             if (gameState === "ready_for_next_deal") {
                 o.pgDealUIModel.get('handmodels').forEach(function(handModel) {
                     handModel.unpreviewTiles();
@@ -172,10 +149,39 @@ define([
         },
 
         _tilesAreSet: function(e) {
+            var o = this._options;
              o.pgDealUIModel.set('state', 'finished_setting_tiles');
         },
 
-        _handleGameState: function() {
+        _onHandStateChange: function(model, newwState) {
+            var o = this._options;
+            o.pgDealUIModel.set('state', "thinking");
+        },
+
+        _onDealStateChange: function(model, newState) {
+            var o = this._options;
+            switch (newState) {
+                case "thinking":
+                    o.pgDealUIModel.get('handmodels').forEach(function(handModel) {
+                        handModel.unpreviewTiles();
+                    });
+                    this.$(".pg-deal-preview-hands").text("Preview Hands");
+                    this.$('.pg-deal-preview-hands').removeAttr('disabled');
+                    this.$('.pg-deal-tiles-are-set').attr('disabled', true);
+                    this.$el.removeClass('pg-no-manipulate');
+                break;
+                case "previewing":
+                    o.pgDealUIModel.get('handmodels').forEach(function(handModel) {
+                        handModel.previewTiles();
+                    });
+                    this.$(".pg-deal-preview-hands").text("Reconsider");
+                    this.$('.pg-deal-tiles-are-set').removeAttr('disabled');
+                    this.$el.addClass('pg-no-manipulate');
+                break;
+            }
+        },
+
+        _onGameStateChange: function() {
           var $handsButton = $(".pg-deal-preview-hands");
             switch (this._gameModel.get('state')) {
                 case "ready_for_next_deal":
@@ -198,6 +204,13 @@ define([
                     $handsButton.text("Preview hands");
                 break;
             }
+        },
+
+        _handModels: function() {
+            var o = this._options;
+            return _.map(o.pgHandViews, function(pgHandView) {
+                return pgHandView._options.pgHandUIModel;
+            });
         }
 
     });
