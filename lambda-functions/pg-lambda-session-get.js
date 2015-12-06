@@ -10,18 +10,13 @@ exports.handler = function(event, context) {
     console.log(event);
 
     function validateRequest() {
-        var defer = q.defer();
-
-        defer.resolve();
-
-        return defer.promise;
+        return dbUtils.validateSession(dynamodb, event.sessionHash);
     }
 
     // Actually do the work, now that all the functions have been created.
     dynamodb = new (require('dynamodb-doc')).DynamoDB();
     validateRequest()
     .then(function() {
-        if (!event.sessionHash) return { error: 'No session', code: 'PG_ERROR_NO_SESSION' };
         return dbUtils.getItem(dynamodb, 'session', 'sessionHash', event.sessionHash);
     })
     .then(function(session) {
