@@ -167,7 +167,22 @@ define([
         },
 
         _newGame: function(e) {
-            console.log('new game');
+            var ajaxOptions = {
+                method: 'POST',
+                contentType: 'application/json',
+                url: this._options.pgSessionModel.urlRoot + '/game',
+                data: JSON.stringify({
+                    opponent: 'computer'
+                }),
+                success: function(data) {
+                    console.log('new game success!');
+                },
+                error: function(err) {
+                    console.log(err);
+                }
+            };
+            this._options.pgSessionModel.addSessionHashHeader(ajaxOptions);
+            $.ajax(ajaxOptions);
         }
     });
 

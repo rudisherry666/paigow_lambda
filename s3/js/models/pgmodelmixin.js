@@ -74,7 +74,7 @@ define([
                 addSessionHashHeader: function(options) {
                     if (SESSION_HASH) {
                         options = options || {};
-                        options.headers = options.headers || [];
+                        options.headers = options.headers || {};
                         options.headers['X-PG-Session'] = SESSION_HASH;
                     }
                     return options;

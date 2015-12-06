@@ -64,7 +64,8 @@ exports.handler = function(event, context) {
             players: player.username + '|' + opponent.username,
             situation: 'CREATED',
             startTime: new Date().getTime(),
-            score: [0, 0]
+            score: [0, 0],
+            lastDealIndex: 0
         };
         console.log(pg);
         deal = pg.newDeal(game.gameHash,  0);

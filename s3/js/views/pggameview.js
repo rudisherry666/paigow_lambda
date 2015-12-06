@@ -8,12 +8,14 @@
 define([
     'classes/pgtile',
     'models/pgdealmodel',
+    'models/ui/pggameuimodel',
     'views/pgbaseview',
     'views/pgdealview',
     'templates/pggameview'
 ], function(
     PGTile,
     PGDealModel,
+    PGGameUIModel,
     PGBaseView,
     PGDealView,
     template

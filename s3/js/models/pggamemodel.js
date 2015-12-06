@@ -41,7 +41,9 @@ function(
         },
 
         _fetchChanged: function(model, newValue) {
-            this.fetch();
+            if (newValue !== this.defaults.gameHash)  {
+                this.fetch();
+            }
         },
 
         // GameHash is the RESTful attribute in /game
@@ -53,13 +55,13 @@ function(
         // Convenience methods
         startTime: function() {
             var startTime = this.get('startTime');
-            if (this.isNewGame) return '';
+            if (this.isNewGame()) return '';
             return startTime ? (new Date(startTime).toString()) : 'n/a';
         },
 
         score: function() {
             var score = this.get('score');
-            if (this.isNewGame) return '';
+            if (this.isNewGame()) return '';
             return (score && score.join(' - ')) || "n/a";
         },
 
@@ -67,7 +69,7 @@ function(
             var players = this.get('players'),
                 sModel = this.get('sessionModel'),
                 playersArray;
-            if (this.isNewGame) return 'New Game';
+            if (this.isNewGame()) return 'New Game';
             if (!players || !sModel) return 'n/a';
             playersArray = players.split('|');
             return playersArray[0] === sModel.get('username') ?

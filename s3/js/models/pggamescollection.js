@@ -36,7 +36,7 @@ define([
 
         parse: function(data) {
             var vals = this._super(data);
-            vals.unshift(new PGGameModel());
+            vals.unshift({gameHash: 'new-game'});
             return vals;
         },
 
