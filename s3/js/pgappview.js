@@ -41,11 +41,18 @@ define([
 
         },
 
+        events: function() {
+            return {
+                'click #pg-new-game'   :   '_newGame'
+            };
+        },
+
         _addModelListeners: function() {
             var eBus = this._options.eventBus;
             this.listenTo(eBus, 'login', this._login);
             this.listenTo(eBus, 'logout', this._logout);
             this.listenTo(eBus, 'click:game', this._resumeGame);
+            this.listenTo(eBus, 'click:opponent', this._clickOpponent);
 
             // Any button on the navbar removes the collapse.
             $(".collapse.navbar-collapse").click(function(e) {
@@ -54,7 +61,7 @@ define([
         },
 
         _login: function() {
-            $('body').removeClass('pg-user-signing-in')
+            $('body').removeClass('pg-user-signing-in pg-user-not-signed-in')
                      .addClass('pg-user-signed-in');
 
             // Create a player model that will communicate with the server about
@@ -103,7 +110,7 @@ define([
         _logout: function() {
             var o = this._options;
 
-            $('body').removeClass('pg-user-signing-in')
+            $('body').removeClass('pg-user-signing-in pg-user-signed-in')
                      .addClass('pg-user-not-signed-in');
 
             var pModel = o.pgPlayerModel;
@@ -151,6 +158,16 @@ define([
             });
 
             o.pgGameView.render();
+        },
+
+        _clickOpponent: function(e) {
+            if (e.pgGameModel.isNewGame()) {
+                this._newGame();
+            }
+        },
+
+        _newGame: function(e) {
+            console.log('new game');
         }
     });
 

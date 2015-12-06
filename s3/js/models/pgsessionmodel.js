@@ -59,7 +59,7 @@ define([
                         action: 'login'
                     }),
                 ajaxOptions = {
-                    url: this.urlRootBase + '/login',
+                    url: this.urlRoot + '/login',
                     method: 'POST',
                     contentType: 'application/json',
                     dataType: 'json',
@@ -87,7 +87,7 @@ define([
         register: function(username, password, email) {
             var defer = $.Deferred(),
                 ajaxOptions = {
-                    url: this.urlRootBase + '/login',
+                    url: this.urlRoot + '/login',
                     method: 'POST',
                     contentType: 'application/json;charset=UTF-8',
                     success: _.bind(function(data) {

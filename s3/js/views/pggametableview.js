@@ -1,11 +1,13 @@
 define([
     'views/pgbaseview',
     'templates/pggametableview',
+    'models/pggamemodel',
     'models/pggamescollection',
     'views/pggametablerowview',
 ], function(
     PGBaseView,
     template,
+    PGGameModel,
     PGGamesCollection,
     PGGameTableRowView
 ) {
@@ -30,9 +32,10 @@ define([
         },
 
         _addConvenienceProperties: function() {
+            var retVal = this._super();
             this.$table = this.$('.pg-games-table');
 
-            return this._super();
+            return retVal;
         },
 
         _gameAdded: function(model, collection, options) {

@@ -9,7 +9,7 @@
 define([], function() {
 
     return {
-        mock: true,
+        mock: false,
 
         mockCookie: '; pg-session-hash=session-hash-1',
 
@@ -46,7 +46,7 @@ define([], function() {
 
         mockDeals: {
             'game-hash-4#0' : {
-                dealID: 'game-hash-1#0',
+                dealID: 'game-hash-4#0',
                 situation: 'TILES_NOT_SET',
                 points: [ -1, -1 ],
                 tiles: [

@@ -34,6 +34,12 @@ define([
             });
         },
 
+        parse: function(data) {
+            var vals = this._super(data);
+            vals.unshift(new PGGameModel());
+            return vals;
+        },
+
         model: PGGameModel,
 
         urlPath: '/games',

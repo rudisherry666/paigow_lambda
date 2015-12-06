@@ -24,12 +24,12 @@ function(
             this.set(this.defaults);
             this._addModelListeners();
 
-            if (options.gameHash) this.set('gameHash', options.gameHash);
+            if (options && options.gameHash) this.set('gameHash', options.gameHash);
         },
 
         // A game is specific to a player.
         defaults: {
-            'gameHash': null,
+            'gameHash': 'new-game',
             'players': '',
             'situation': '',
             'startTime': '',
@@ -53,11 +53,13 @@ function(
         // Convenience methods
         startTime: function() {
             var startTime = this.get('startTime');
+            if (this.isNewGame) return '';
             return startTime ? (new Date(startTime).toString()) : 'n/a';
         },
 
         score: function() {
             var score = this.get('score');
+            if (this.isNewGame) return '';
             return (score && score.join(' - ')) || "n/a";
         },
 
@@ -65,10 +67,15 @@ function(
             var players = this.get('players'),
                 sModel = this.get('sessionModel'),
                 playersArray;
+            if (this.isNewGame) return 'New Game';
             if (!players || !sModel) return 'n/a';
             playersArray = players.split('|');
             return playersArray[0] === sModel.get('username') ?
                 playersArray[1] : playersArray[0];
+        },
+
+        isNewGame: function() {
+            return (this.get('gameHash') === 'new-game');
         },
 
         mockFetchResponse: function() {

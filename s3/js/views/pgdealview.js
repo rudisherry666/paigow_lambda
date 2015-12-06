@@ -78,8 +78,8 @@ define([
                 }, this)
             );
 
-            // if (this._gameModel) {
-            //     this._gameModel.on("change:state", _.bind(function() { this._onGameStateChange(); }, this))
+            // if (o.pgGameUIModel) {
+            //     o.pgGameUIModel.on("change:state", _.bind(function() { this._onGameStateChange(); }, this))
             // }
 
             return this._super();
@@ -128,12 +128,12 @@ define([
         _previewHands: function(e) {
             // Double-duty: next-deal or preview-hands
             var o = this._options,
-                gameState = this._gameModel.get('state');
+                gameState = o.pgGameUIModel.get('state');
             if (gameState === "ready_for_next_deal") {
                 o.pgDealUIModel.get('handmodels').forEach(function(handModel) {
                     handModel.unpreviewTiles();
                 });
-                this._gameModel.set('state', "new_deal_asked_for");
+                o.pgGameUIModel.set('state', "new_deal_asked_for");
             } else {
                 var newState = o.pgDealUIModel.get('state');
                 switch(newState) {
@@ -182,8 +182,9 @@ define([
         },
 
         _onGameStateChange: function() {
-          var $handsButton = $(".pg-deal-preview-hands");
-            switch (this._gameModel.get('state')) {
+            var o = this._options,
+                $handsButton = $(".pg-deal-preview-hands");
+            switch (o.pgGameUIModel.get('state')) {
                 case "ready_for_next_deal":
                     $handsButton.text("Next Deal");
                     this.$('.pg-deal-preview-hands').removeAttr('disabled');

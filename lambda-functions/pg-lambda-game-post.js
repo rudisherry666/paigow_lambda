@@ -1,6 +1,7 @@
 var q = require('q'),
     utils = require('general-utils'),
     dbUtils = require('db-utils'),
+    pg = require('pg'),
     dynamodb, session;
 
 exports.handler = function(event, context) {
@@ -55,6 +56,8 @@ exports.handler = function(event, context) {
     .then(function(locPlayer) {
         player = locPlayer;
 
+        console.log('have player, creating game and deal');
+
         // we have a player.  Create a game and deal.
         game = {
             gameHash: utils.newRandomID(),
@@ -63,15 +66,10 @@ exports.handler = function(event, context) {
             startTime: new Date().getTime(),
             score: [0, 0]
         };
-        deal = {
-            'game-hash': game.gameHash,
-            'deal-index': 0,
-            'situation': [
-                'TILES_NOT_SET',
-                'TILES_NOT_SET'
-            ],
-            'points': [ 0, 0 ]
-        };
+        console.log(pg);
+        deal = pg.newDeal(game.gameHash,  0);
+        console.log('deal: ');
+        console.log(deal);
         return q.all([
             dbUtils.putItem(dynamodb, 'deal', deal),
             dbUtils.putItem(dynamodb, 'game', game)

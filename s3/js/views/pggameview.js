@@ -24,6 +24,7 @@ define([
         _addModels: function() {
             var o = this._options;
 
+            o.pgGameUIModel = new PGGameUIModel({ eventBus: o.eventBus });
             o.pgDealModel = new PGDealModel({ eventBus: o.eventBus });
 
             return this._super();
@@ -37,7 +38,7 @@ define([
 
             // this.listenTo(o.playerDealModel, 'change:state', this._handleDealState);
             this.listenTo(o.pgGameModel, 'change:score', this._updateScore);
-            this.listenTo(o.pgGameModel, 'change:state', this._onGameStateChange);
+            this.listenTo(o.pgGameUIModel, 'change:state', this._onGameStateChange);
 
             return this._super();
         },
@@ -106,8 +107,8 @@ define([
         },
 
         _onGameStateChange: function(model, newState) {
-            // Convenience var for possible states
-            var states = this._gameModel.state;
+            var o = this._options,
+                states = o.pgGameUIModel.state;
 
             // We're in "no" state now.
             this.$el.removeClass('pg-game-making-room pg-game-ready-for-next-deal pg-game-comparing-hands pg-game-dealing-tiles pg-game-setting-tiles');

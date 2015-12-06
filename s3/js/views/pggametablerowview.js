@@ -15,7 +15,8 @@ define([
         tagName: 'tr',
 
         events: {
-            'click .pg-games-row-start-time' : '_onClickStartTime'
+            'click .pg-games-row-start-time' : '_onClickStartTime',
+            'click .pg-games-row-opponent'   : '_onClickOpponent'
         },
 
         _addModelListeners: function() {
@@ -50,6 +51,12 @@ define([
 
         _onClickStartTime: function(e) {
             this._options.eventBus.trigger('click:game', {
+                pgGameModel: this.model
+            });
+        },
+
+        _onClickOpponent: function(e) {
+            this._options.eventBus.trigger('click:opponent', {
                 pgGameModel: this.model
             });
         }
