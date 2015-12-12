@@ -41,6 +41,7 @@ define([
             // this.listenTo(o.playerDealModel, 'change:state', this._handleDealState);
             this.listenTo(o.pgGameModel, 'change:score', this._updateScore);
             this.listenTo(o.pgGameUIModel, 'change:state', this._onGameStateChange);
+            this.listenTo(p.pgDealModel, 'change:state', this._handleDealState);
 
             return this._super();
         },
@@ -162,7 +163,7 @@ define([
                 break;
 
                 // The player has set their tiles
-                case 'finished_setting_tiles':
+                case 'tiles_are_set':
                     this._gameModel.set('state', "scoring");
 
                     // Show the computer hands

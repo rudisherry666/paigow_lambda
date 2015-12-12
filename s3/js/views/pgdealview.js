@@ -148,9 +148,10 @@ define([
             }
         },
 
+        // User clicked 'Tiles Are Set'
         _tilesAreSet: function(e) {
             var o = this._options;
-             o.pgDealUIModel.set('state', 'finished_setting_tiles');
+             o.pgDealUIModel.set('state', 'tiles_are_set');
         },
 
         _onHandStateChange: function(model, newwState) {
@@ -161,6 +162,10 @@ define([
         _onDealStateChange: function(model, newState) {
             var o = this._options;
             switch (newState) {
+                case 'tiles_are_set':
+                    // User clicked tiles-are-set.
+                    o.eventBus.trigger('deal:tiles_are_set');
+                break;
                 case "thinking":
                     o.pgDealUIModel.get('handmodels').forEach(function(handModel) {
                         handModel.unpreviewTiles();
