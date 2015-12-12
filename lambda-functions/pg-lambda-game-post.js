@@ -83,7 +83,7 @@ exports.handler = function(event, context) {
     })
     .then(function() {
         // All success! Return the game ID.
-        context.succeed({ http_body: game.gameHash, http_status: 201, code: 'PG_INFO_GAME_CREATED' });
+        context.succeed({ gameHash: game.gameHash });
     })
     .fail(function(err) {
         // TODO: if writing some stuff failled, we have to back out.

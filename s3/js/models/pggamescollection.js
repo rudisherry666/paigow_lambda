@@ -24,8 +24,8 @@ define([
         // Startup
         initialize: function() {
 
-            // Fetch: maybe it will change.
-            this.fetch();
+            // // Fetch: maybe it will change.
+            // this.fetch();
 
             // When we've changed an we've synced,
             // then we're static again.

@@ -41,7 +41,7 @@ define([
             // this.listenTo(o.playerDealModel, 'change:state', this._handleDealState);
             this.listenTo(o.pgGameModel, 'change:score', this._updateScore);
             this.listenTo(o.pgGameUIModel, 'change:state', this._onGameStateChange);
-            this.listenTo(p.pgDealModel, 'change:state', this._handleDealState);
+            this.listenTo(o.pgDealModel, 'change:state', this._handleDealState);
 
             return this._super();
         },
@@ -73,12 +73,24 @@ define([
         },
 
         _renderChildren: function() {
-            var o = this._options;
+            var o = this._options,
+                pgGameModel = o.pgGameModel,
+                lastDealIndex = pgGameModel.get('lastDealIndex');
 
-            // This will cause the deal to fetch, and then trigger 'sync'
-            // will cause 
-            o.pgDealModel.set('dealID',
-                o.pgGameModel.get('gameHash') + '#' + o.dealIndex);
+            // We might be called before the game has completed fetching: if
+            // the lastDealIndex is -1, wait until it's set.
+            if (lastDealIndex < 0) {
+                pgGameModel.once('change:lastDealIndex', _.bind(function(model, dealIndex) {
+                    o.pgDealModel.set('dealID',
+                        pgGameModel.get('gameHash') + '#' + dealIndex);
+                }, this));
+
+            } else {
+                // This will cause the deal to fetch, and then trigger 'sync'
+                // will cause <huh? unfinished comment>
+                o.pgDealModel.set('dealID',
+                    pgGameModel.get('gameHash') + '#' + lastDealIndex);
+            }
 
             return this._super();
         },
@@ -90,23 +102,6 @@ define([
             // } else {
             //     this.$el.finish().fadeOut(500);
             // }
-        },
-
-        newGame: function() {
-            this.$el.finish().fadeOut(500);
-            this.render();
-
-            var $game = $(".pggame");
-
-            // Set the score.  Manually trigger a score change just in case the score
-            // was already 0-0.  Unfortunately is no backbone option to force a trigger
-            // even if the new value is the same as the last value.
-            this._gameModel.set('player_score', 0);
-            this._gameModel.set('opponent_score', 0);
-            this._gameModel.trigger("change:score");
-
-            this.$el.finish().fadeIn(500);
-            this._newDeal();
         },
 
         _onGameStateChange: function(model, newState) {
@@ -139,19 +134,10 @@ define([
             }
         },
 
-        _newDeal: function() {
-            this._deckModel.washTiles();
-
-            // We deal the tiles, start over.
-            this._gameModel.set('state', "just_dealt");
-
-            // Order the three hands (sets)
-            this._dealViews[1].orderSets();
-            this._opponentDealModel.set('state', 'previewing');
-        },
-
         _handleDealState: function() {
-            switch (this._playerDealModel.get('state')) {
+            var o = this._options;
+
+            switch (o.pgDealModel.get('state')) {
 
                 case 'thinking':
                 case 'previewing':
@@ -164,7 +150,7 @@ define([
 
                 // The player has set their tiles
                 case 'tiles_are_set':
-                    this._gameModel.set('state', "scoring");
+                    o.pgGameModel.set('state', "scoring");
 
                     // Show the computer hands
                     $(".pg-opponent-deal").removeClass("pg-hidden-hand");
@@ -174,7 +160,7 @@ define([
                     // All the handpoints: they go from player 321 to computer 321.
                     var $scoreNums = this.$el.find('.pg-handpoints');
                     var $hands = this.$el.find('.pghand');
-                    var playerHands = this._playerDealModel.get('handmodels');
+                    var playerHands = o.pgDealModel.get('handmodels');
                     var computerHands = this._opponentDealModel.get('handmodels');
                     for (var hi = 0; hi < 3; hi++) {
                         var points = 3 - hi;
@@ -188,7 +174,7 @@ define([
                                 $($hands[computerIndex]).addClass('pg-loser');
                                 $($scoreNums[playerIndex]).addClass('pg-winner');
                                 $($scoreNums[computerIndex]).addClass('pg-loser');
-                                this._gameModel.set('player_score', this._gameModel.get('player_score') + points);
+                                o.pgGameModel.set('player_score', o.pgGameModel.get('player_score') + points);
                             break;
 
                             case 0:   // push
@@ -203,28 +189,29 @@ define([
                                 $($hands[playerIndex]).addClass('pg-loser');
                                 $($scoreNums[computerIndex]).addClass('pg-winner');
                                 $($scoreNums[playerIndex]).addClass('pg-loser');
-                                this._gameModel.set('opponent_score', this._gameModel.get('opponent_score') + points);
+                                o.pgGameModel.set('opponent_score', o.pgGameModel.get('opponent_score') + points);
                             break;
                         }
                     }
 
                     // Test for finished game.
-                    if (this._gameModel.get('player_score') >= 21 || this._gameModel.get('opponent_score') >= 21) {
+                    if (o.pgGameModel.get('player_score') >= 21 || o.pgGameModel.get('opponent_score') >= 21) {
                         // Game is finished.  User will have to pick new game.
-                        this._gameModel.set('state', 'game_over');
+                        o.pgGameModel.set('state', 'game_over');
                     } else {
                         // Still more to play.
-                        this._gameModel.set('state', "ready_for_next_deal");
+                        o.pgGameModel.set('state', "ready_for_next_deal");
                     }
                 break;
             }
         },
 
         _updateScore: function() {
-            this.$el.find('.pg-player-name').text(this._playerModel.get('username'));
-            this.$el.find('.pg-player-score').text(this._gameModel.get('player_score'));
-            this.$el.find('.pg-opponent-name').text(this._gameModel.get('opponent_name'));
-            this.$el.find('.pg-opponent-score').text(this._gameModel.get('opponent_score'));
+            var o = this._options;
+            this.$el.find('.pg-player-name').text(o.pgPlayerModel.get('username'));
+            this.$el.find('.pg-player-score').text(o.pgGameModel.get('player_score'));
+            this.$el.find('.pg-opponent-name').text(o.pgGameModel.get('opponent_name'));
+            this.$el.find('.pg-opponent-score').text(o.pgGameModel.get('opponent_score'));
         },
 
         _gameTemplate:

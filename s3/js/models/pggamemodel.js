@@ -34,6 +34,7 @@ function(
             'situation': '',
             'startTime': '',
             'score': [ -1, -1 ],
+            'lastDealIndex': -1
         },
 
         _addModelListeners: function() {

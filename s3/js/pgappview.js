@@ -12,6 +12,7 @@ define([
     'models/pgsessionmodel',
     'models/pgdeckmodel',
     'models/pggamemodel',
+    'models/pggamescollection',
     'views/pggametableview',
     'views/pggameview'
 ], function(
@@ -21,6 +22,7 @@ define([
     PGSessionModel,
     PGDeckModel,
     PGGameModel,
+    PGGamesCollection,
     PGGameTableView,
     PGGameView
 ) {
@@ -73,6 +75,8 @@ define([
                 success: _.bind(function() {
                     var o = this._options;
 
+                    this._options.pgGamesCollection = new PGGamesCollection();
+
                     console.log('success getting player');
 
                     if (o.pgSigninView) {
@@ -96,9 +100,13 @@ define([
                             el: $('#pg-games-table-wrapper'),
                             eventBus: this._options.eventBus,
                             pgSessionModel: this._options.pgSessionModel,
+                            pgGamesCollection: this._options.pgGamesCollection
                         });
                         o.pgGameTableView.render();
                     }
+
+                    // Now that we have a table, get the games.
+                    this._options.pgGamesCollection.fetch();
 
                 }, this),
                 error: _.bind(function() {
@@ -154,7 +162,7 @@ define([
                 pgSessionModel: o.pgSessionModel,
                 pgPlayerModel: o.pgPlayerModel,
                 pgGameModel: e.pgGameModel,
-                dealIndex: e.pgGameModel.get('lastDealIndex'),
+                // dealIndex: e.pgGameModel.get('lastDealIndex'),
             });
 
             o.pgGameView.render();
@@ -174,9 +182,23 @@ define([
                 data: JSON.stringify({
                     opponent: 'computer'
                 }),
-                success: function(data) {
-                    console.log('new game success!');
-                },
+                success: _.bind(function(data) {
+                    var o = this._options;
+
+                    // Start the game once the add has finished.
+                    this._options.pgGamesCollection.once('add', _.bind(function(pgGameModel) {
+                        this._resumeGame({
+                            pgGameModel: pgGameModel,
+                            pgSessionModel: o.pgSessionModel,
+                            pgPlayerModel: o.pgPlayerModel
+                        });
+                    }, this));
+                    // We created a new game; the response is the same
+                    // as getting all the games, so just add it as is
+                    // and the new game will be vivified.
+                    this._options.pgGamesCollection.add(data);
+
+                }, this),
                 error: function(err) {
                     console.log(err);
                 }

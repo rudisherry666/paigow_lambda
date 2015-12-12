@@ -15,7 +15,6 @@ define([
     var PGGameTableView = PGBaseView.extend({
 
         _addModelListeners: function() {
-            this._options.pgGamesCollection = new PGGamesCollection();
             this.listenTo(this._options.pgGamesCollection, 'add', this._gameAdded)
                 .listenTo(this._options.pgGamesCollection, 'remove', this._gameRemoved);
 
