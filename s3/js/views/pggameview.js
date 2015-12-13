@@ -208,18 +208,7 @@ define([
 
         _updateScore: function() {
             var o = this._options;
-            this.$el.find('.pg-player-name').text(o.pgPlayerModel.get('username'));
-            this.$el.find('.pg-player-score').text(o.pgGameModel.get('player_score'));
-            this.$el.find('.pg-opponent-name').text(o.pgGameModel.get('opponent_name'));
-            this.$el.find('.pg-opponent-score').text(o.pgGameModel.get('opponent_score'));
         },
-
-        _gameTemplate:
-                '<div>' +
-                    '<p class="pgscore"><span class="pg-player-name"></span>: <span class="pg-player-score"></span> <span class="pg-opponent-name"></span>: <span class="pg-opponent-score"></span></p>' +
-                    '<div class="pgdeal pg-player-deal"></div>' +
-                    '<div class="pgdeal pg-opponent-deal pg-hidden-hand"></div>' +
-                '</div>'
 
     });
 

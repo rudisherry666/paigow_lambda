@@ -47,7 +47,6 @@ define([
                     el: this.$('.pghand')[hvi],
                     eventBus: o.eventBus,
                     pgDealModel: o.pgDealModel,
-                    pgDealView: o.pgDealView,
                     isPlayer: o.isPlayer,
                     handIndex: hvi,
                 }));

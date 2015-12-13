@@ -6,11 +6,13 @@
 */
 
 define([
+    'utils/pgbrowserutils',
     'views/pgbaseview',
     'models/ui/pghanduimodel',
     'views/pgtileview',
     'templates/pggameview'
 ], function(
+    PGBrowserUtils,
     PGBaseView,
     PGHandUIModel,
     PGTileView,
@@ -38,8 +40,8 @@ define([
                 h = o.pgHandUIModel;
 
             this.listenTo(h, 'change:tileIndexes', this._tilesChanged);
-            this.listenTo(h, 'hand:previewed', this._previewHand);
             this.listenTo(h, 'hand:unpreviewed', this._unpreviewHand);
+            this.listenTo(o.eventBus, 'deal:tiles_are_set', this._tilesAreSet);
 
             return this._super();
         },
@@ -94,9 +96,37 @@ define([
             h.set('tileIndexes', tileIndexes);
         },
 
-        _previewHand: function() {
+        _tilesAreSet: function(options) {
+            var o = this._options,
+                h = o.pgHandUIModel,
+                tileIndexes = h.get('tileIndexes').slice(0);
+
+            // Put the higher hand on the left
+            var highHand = new PGHand(tileIndexes[0], tileIndexes[1]);
+            var lowHand = new PGHand(tileIndexes[2], tileIndexes[3]);
+            if (highHand.compare(lowHand) < 0) {
+                tileIndexes = [ tileIndexes[2], tileIndexes[3], tileIndexes[0], tileIndexes[1] ];
+            }
+
+            // Make sure each hand has the higher tiles.
+            function compareAndSwitchIfNecessary(a, b) {
+                if (new PGTile(tileIndexes[a]).compare(new PGTile(tileIndexes[b])) < 0) {
+                    var tempIndex = tileIndexes[a];
+                    tileIndexes[a] = tileIndexes[b];
+                    tileIndexes[b] = tempIndex;
+                }
+            }
+            compareAndSwitchIfNecessary(0, 1);
+            compareAndSwitchIfNecessary(2, 3);
+
+            h.set('tileIndexes', tileIndexes);
+
             var twoTile = this.$('.pg2tile>div')[1];
             PGBrowserUtils.animateRotate($(twoTile), 0, 90);
+        },
+
+        unpreviewTiles: function(options) {
+            this.trigger('hand:unpreviewed');
         },
 
         _unpreviewHand: function() {

@@ -16,7 +16,7 @@ define([
     template
 ) {
     
-    var PGPTileView = PGBaseView.extend({
+    var PGTileView = PGBaseView.extend({
 
         _addChildElements: function() {
             this.$el.append(_.template(template.tile)({}));
@@ -60,5 +60,5 @@ define([
 
     });
 
-    return PGPTileView;
+    return PGTileView;
 });
