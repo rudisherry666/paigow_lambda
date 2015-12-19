@@ -19,6 +19,9 @@ define([
     
     var PGDealView = PGBaseView.extend({
 
+        // -------------------------------------------------------
+        // Superclass overrides
+
         events: {
             'click .pgswitchhands-btn'        : "_switchHands",
             'click .pg-deal-preview-hands'    : "_previewHands",
@@ -80,50 +83,79 @@ define([
             this.listenTo(o.pgDealUIModel, 'change:state',
                 this._onDealStateChange);
 
-            // If any of the handmodel states change, make sure we're i
-            // "thinking".  TODO: use event bus?
-            _.each(o.pgHandViews, _.bind(function(pgHandView) {
-                this.listenTo(pgHandView.model, 'change:tiles',
-                    this._onHandStateChange);
-                }, this)
-            );
-
             return this._super();
         },
+
+        // -------------------------------------------------------
+        // Handlers
+
+        _switchHands: function(e) {
+            var whichHand = parseInt($(e.target).attr('data-handindex'), 10);
+            this._switchHandsEx(whichHand);
+        },
+
+        // User clicked 'Preview Handls'
+        _previewHands: function(e) {
+            this._setDealState('previewing');
+        },
+
+        _unPreviewHands: function(e) {
+            this._setDealState('thinking');
+        },
+
+        _tilesAreSet: function(e) {
+            this._setDealState('tiles_are_set');
+        },
+
+        _nextDeal: function(e) {
+            this._setDealState('ready_for_next_deal');
+        },
+
+        _anotherGame: function(e) {
+            this._setDealState('ready_for_next_game');
+        },
+
+        _onDealStateChange: function(model, newState) {
+            var o = this._options;
+            switch (newState) {
+                case 'tiles_are_set':
+                    this._setClass('pg-deal-tiles-are-set');
+                    o.eventBus.trigger('deal:tiles_are_set');
+                break;
+                case "thinking":
+                    this._setClass('pg-deal-thinking');
+                    this.$el.removeClass('pg-no-manipulate pg-hidden-hands');
+                break;
+                case "previewing":
+                    this._setClass('pg-deal-previewing');
+                    this.$el.addClass('pg-no-manipulate');
+                break;
+
+                case "ready_for_next_deal":
+                    this._setClass('pg-deal-ready_for_next_deal');
+                    this.$el.addClass('pg-no-manipulate pg-hidden-hands');
+                    o.eventBus.trigger('deal:ready_for_next_deal');
+                break;
+
+                case "ready_for_next_game":
+                    this._setClass('pg-deal-ready_for_next_game');
+                    this.$el.addClass('pg-no-manipulate pg-hidden-hands');
+                    o.eventBus.trigger('deal:ready_for_next_game');
+                break;
+            }
+        },
+
+        // -------------------------------------------------------
+        // Convenience methods
 
         _setClass: function(newClass) {
             this.$el.removeClass('pg-deal-thinking pg-deal-previewing pg-deal-deal-done pg-deal-game-done')
                     .addClass(newClass);
         },
 
-        orderSets: function() {
-            var handModels = o.pgDealUIModel.get('handmodels');
-            var sets = [
-                handModels[0].pgSet(),
-                handModels[1].pgSet(),
-                handModels[2].pgSet()
-            ];
-            var sads = [
-                sets[0].sumAndDiff().sum,
-                sets[1].sumAndDiff().sum,
-                sets[2].sumAndDiff().sum
-            ];
-
-            var self = this;
-            function switchSad(i) {
-                var temp = sads[i];
-                sads[i] = sads[i+1];
-                sads[i+1] = temp;
-                self._switchHandsEx(i);
-            }
-            if (sads[0] < sads[1]) switchSad(0);
-            if (sads[1] < sads[2]) switchSad(1);
-            if (sads[0] < sads[1]) switchSad(0);
-        },
-
-        _switchHands: function(e) {
-            var whichHand = parseInt($(e.target).attr('data-handindex'), 10);
-            this._switchHandsEx(whichHand);
+        _setDealState: function(newState) {
+            var o = this._options;
+            o.pgDealUIModel.set('state', newState);
         },
 
         _switchHandsEx: function(whichHand) {
@@ -133,58 +165,6 @@ define([
                 ti2 = hv[whichHand+1].tileIndexes();
             hv[whichHand].setTileIndexes(ti2);
             hv[whichHand+1].setTileIndexes(ti1);
-        },
-
-        // User clicked 'Preview Handls'
-        _previewHands: function(e) {
-            var o = this._options;
-            this._setClass('pg-deal-previewing');
-            o.pgDealUIModel.set('state', 'previewing');
-        },
-
-        _unPreviewHands: function(e) {
-            var o = this._options;
-            this._setClass('pg-deal-thinking');
-            o.pgDealUIModel.set('state', 'thinking');
-        },
-
-        _tilesAreSet: function(e) {
-            var o = this._options;
-            this._setClass('pg-deal-tiles-are-set');
-            o.pgDealUIModel.set('state', 'tiles_are_set');
-        },
-
-        _nextDeal: function(e) {
-            var o = this._options;
-            this._setClass('pg-deal-dealing');
-            o.eventBus.trigger('deal:ready_for_next_deal');
-        },
-
-        _anotherGame: function(e) {
-            var o = this._options;
-            this._setClass('pg-deal-dealing');
-            o.eventBus.trigger('deal:ready_for_next_game');
-        },
-
-        _onHandStateChange: function(model, newwState) {
-            var o = this._options;
-            o.pgDealUIModel.set('state', "thinking");
-        },
-
-        _onDealStateChange: function(model, newState) {
-            var o = this._options;
-            switch (newState) {
-                case 'tiles_are_set':
-                    // User clicked tiles-are-set.
-                    o.eventBus.trigger('deal:tiles_are_set');
-                break;
-                case "thinking":
-                    this.$el.removeClass('pg-no-manipulate');
-                break;
-                case "previewing":
-                    this.$el.addClass('pg-no-manipulate');
-                break;
-            }
         },
 
     });
