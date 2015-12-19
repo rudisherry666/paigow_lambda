@@ -30,7 +30,7 @@ function(
 
         idAttribute: 'dealID',
         urlPath: function() {
-            return '/game/' + this.gameHash() + '/deal/' + this.dealIndex();
+            return '/game/' + this.gameHash() + '/deal/' + this.dealIndex() + '/player';
         },
 
         // Convenience functions
