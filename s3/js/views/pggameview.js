@@ -41,7 +41,8 @@ define([
             // this.listenTo(o.playerDealModel, 'change:state', this._handleDealState);
             this.listenTo(o.pgGameModel, 'change:score', this._updateScore);
             this.listenTo(o.pgGameUIModel, 'change:state', this._onGameStateChange);
-            this.listenTo(o.pgDealModel, 'change:state', this._handleDealState);
+
+            this.listenTo(o.eventBus, 'deal:tiles_are_set', this._tilesAreSet);
 
             return this._super();
         },
@@ -142,67 +143,77 @@ define([
                 case 'thinking':
                 case 'previewing':
                     // Make sure the computer hand is hidden
-                    $(".pg-opponent-deal").addClass("pg-hidden-hand");
+                    $(".pg-deal-opponent").addClass("pg-hidden-hand");
 
                     // All point-nums back to normal.
                     this.$el.find('.pg-handpoints, .pghand').removeClass("pg-winner pg-loser pg-push");
                 break;
 
-                // The player has set their tiles
-                case 'tiles_are_set':
-                    o.pgGameModel.set('state', "scoring");
+            }
+        },
 
-                    // Show the computer hands
-                    $(".pg-opponent-deal").removeClass("pg-hidden-hand");
+        // The player has set their tiles
+        _tilesAreSet: function() {
 
-                    // Set the score.
+            // Create a new deal structure from the existing one and the new
+            // setting of the tiles.
+            var newDeal = {
 
-                    // All the handpoints: they go from player 321 to computer 321.
-                    var $scoreNums = this.$el.find('.pg-handpoints');
-                    var $hands = this.$el.find('.pghand');
-                    var playerHands = o.pgDealModel.get('handmodels');
-                    var computerHands = this._opponentDealModel.get('handmodels');
-                    for (var hi = 0; hi < 3; hi++) {
-                        var points = 3 - hi;
-                        var playerIndex = hi;
-                        var computerIndex = hi + 3;
-                        var playerSet = playerHands[hi].pgSet();
-                        var computerSet = computerHands[hi].pgSet();
-                        switch (playerSet.compare(computerSet)) {
-                            case 1:   // player wins
-                                $($hands[playerIndex]).addClass('pg-winner');
-                                $($hands[computerIndex]).addClass('pg-loser');
-                                $($scoreNums[playerIndex]).addClass('pg-winner');
-                                $($scoreNums[computerIndex]).addClass('pg-loser');
-                                o.pgGameModel.set('player_score', o.pgGameModel.get('player_score') + points);
-                            break;
+            };
 
-                            case 0:   // push
-                                $($hands[playerIndex]).addClass('pg-push');
-                                $($hands[computerIndex]).addClass('pg-push');
-                                $($scoreNums[playerIndex]).addClass('pg-push');
-                                $($scoreNums[computerIndex]).addClass('pg-push');
-                            break;
+            // Tell the server the tiles are set.
 
-                            case -1:  // computer wins
-                                $($hands[computerIndex]).addClass('pg-winner');
-                                $($hands[playerIndex]).addClass('pg-loser');
-                                $($scoreNums[computerIndex]).addClass('pg-winner');
-                                $($scoreNums[playerIndex]).addClass('pg-loser');
-                                o.pgGameModel.set('opponent_score', o.pgGameModel.get('opponent_score') + points);
-                            break;
-                        }
-                    }
+            o.pgGameModel.set('state', "scoring");
 
-                    // Test for finished game.
-                    if (o.pgGameModel.get('player_score') >= 21 || o.pgGameModel.get('opponent_score') >= 21) {
-                        // Game is finished.  User will have to pick new game.
-                        o.pgGameModel.set('state', 'game_over');
-                    } else {
-                        // Still more to play.
-                        o.pgGameModel.set('state', "ready_for_next_deal");
-                    }
-                break;
+            // Show the computer hands
+            $(".pg-deal-opponent").removeClass("pg-hidden-hand");
+
+            // Set the score.
+
+            // All the handpoints: they go from player 321 to computer 321.
+            var $scoreNums = this.$el.find('.pg-handpoints');
+            var $hands = this.$el.find('.pghand');
+            var playerHands = o.pgDealModel.get('handmodels');
+            var computerHands = this._opponentDealModel.get('handmodels');
+            for (var hi = 0; hi < 3; hi++) {
+                var points = 3 - hi;
+                var playerIndex = hi;
+                var computerIndex = hi + 3;
+                var playerSet = playerHands[hi].pgSet();
+                var computerSet = computerHands[hi].pgSet();
+                switch (playerSet.compare(computerSet)) {
+                    case 1:   // player wins
+                        $($hands[playerIndex]).addClass('pg-winner');
+                        $($hands[computerIndex]).addClass('pg-loser');
+                        $($scoreNums[playerIndex]).addClass('pg-winner');
+                        $($scoreNums[computerIndex]).addClass('pg-loser');
+                        o.pgGameModel.set('player_score', o.pgGameModel.get('player_score') + points);
+                    break;
+
+                    case 0:   // push
+                        $($hands[playerIndex]).addClass('pg-push');
+                        $($hands[computerIndex]).addClass('pg-push');
+                        $($scoreNums[playerIndex]).addClass('pg-push');
+                        $($scoreNums[computerIndex]).addClass('pg-push');
+                    break;
+
+                    case -1:  // computer wins
+                        $($hands[computerIndex]).addClass('pg-winner');
+                        $($hands[playerIndex]).addClass('pg-loser');
+                        $($scoreNums[computerIndex]).addClass('pg-winner');
+                        $($scoreNums[playerIndex]).addClass('pg-loser');
+                        o.pgGameModel.set('opponent_score', o.pgGameModel.get('opponent_score') + points);
+                    break;
+                }
+            }
+
+            // Test for finished game.
+            if (o.pgGameModel.get('player_score') >= 21 || o.pgGameModel.get('opponent_score') >= 21) {
+                // Game is finished.  User will have to pick new game.
+                o.pgGameModel.set('state', 'game_over');
+            } else {
+                // Still more to play.
+                o.pgGameModel.set('state', "ready_for_next_deal");
             }
         },
 

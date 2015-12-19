@@ -40,8 +40,10 @@ define([
                 h = o.pgHandUIModel;
 
             this.listenTo(h, 'change:tileIndexes', this._tilesChanged);
-            this.listenTo(h, 'hand:unpreviewed', this._unpreviewHand);
             this.listenTo(o.eventBus, 'deal:tiles_are_set', this._tilesAreSet);
+            this.listenTo(o.pgDealUIModel, 'change:state', this._dealStateChanged);
+
+            h.set('state', 'thinking');
 
             return this._super();
         },
@@ -120,18 +122,30 @@ define([
             compareAndSwitchIfNecessary(2, 3);
 
             h.set('tileIndexes', tileIndexes);
-
-            var twoTile = this.$('.pg2tile>div')[1];
-            PGBrowserUtils.animateRotate($(twoTile), 0, 90);
-        },
-
-        unpreviewTiles: function(options) {
-            this.trigger('hand:unpreviewed');
         },
 
         _unpreviewHand: function() {
-            var twoTile = this.$('.pg2tile>div')[1];
-            PGBrowserUtils.animateRotate($(twoTile), 90, 0);
+        },
+
+        _dealStateChanged: function(model, state) {
+            var o = this._options,
+                h = o.pgHandUIModel,
+                twoTile = this.$('.pg2tile>div')[1];
+            switch (state) {
+                case 'thinking':
+                    if (h.get('state') == 'previewing') {
+                        PGBrowserUtils.animateRotate($(twoTile), 90, 0);
+                        h.set('state', 'thinking');
+                    }
+                break;
+
+                case 'previewing':
+                    if (h.get('state') == 'thinking') {
+                        PGBrowserUtils.animateRotate($(twoTile), 0, 90);
+                        h.set('state', 'previewing');
+                    }
+                break;
+            }
         },
 
         // -------------------------------------------------------

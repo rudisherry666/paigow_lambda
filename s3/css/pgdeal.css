@@ -16,18 +16,25 @@
     height: 30px;
 }
 
-.pg-deal-buttons button {
-    display: inline-block;
+.pg-deal-buttons .btn {
+    display: none;
     margin-left: 13px;
     margin-right: 13px;
     margin-bottom: 10px;
 }
 
-.pg-deal-buttons .pg-deal-preview-hands { float: left; }
-.pg-deal-buttons .pg-deal-tiles-are-set { float: right; }
+.pg-deal-buttons .left  { float: left; }
+.pg-deal-buttons .right { float: right; }
 .pg-hidden-hand .pg-deal-buttons,
-.pg-opponent-deal .pg-deal-buttons {
+.pg-deal-opponent .pg-deal-buttons {
     visibility: hidden;
+}
+.pg-deal-thinking   .pg-deal-buttons .pg-deal-preview-hands, 
+.pg-deal-previewing .pg-deal-buttons .pg-deal-un-preview-hands, 
+.pg-deal-previewing .pg-deal-buttons .pg-deal-tiles-are-set,
+.pg-deal-deal-done  .pg-deal-buttons .pg-deal-next-deal,
+.pg-deal-game-done  .pg-deal-buttons .pg-deal-another-game {
+    display: inline-block;
 }
 
 .pgswitchhands-btn {
@@ -64,17 +71,17 @@
     color: LimeGreen;
 }
 
-.pg-opponent-deal {
+.pg-deal-opponent {
     transition: opacity linear 2s;
 }
 
-.pg-opponent-deal {
+.pg-deal-opponent {
     opacity: 1;
 }
 
-.pg-game-making-room .pg-opponent-deal,
-.pg-game-setting-tiles .pg-opponent-deal,
-.pg-game-just-dealt .pg-opponent-deal {
+.pg-game-making-room .pg-deal-opponent,
+.pg-game-setting-tiles .pg-deal-opponent,
+.pg-game-just-dealt .pg-deal-opponent {
     width: 0;
     height: 0;
     opacity: 0;
@@ -82,15 +89,17 @@
 }
 
 .pg-hidden-hand .pgswitchhands-btn,
-.pg-opponent-deal .pgswitchhands-btn
+.pg-deal-opponent .pgswitchhands-btn
  {
     display: none;
 }
 
-.pg-no-manipulate .pg-tile-manipulate-control,
-.pg-opponent-deal .pg-tile-manipulate-control
- {
+.pg-tile-manipulate-control {
     visibility: hidden;
+}
+.pg-deal-thinking .pg-tile-manipulate-control
+{
+    visibility: inherit;
 }
 
 @media (max-width: 560px) {

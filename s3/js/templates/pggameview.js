@@ -11,8 +11,11 @@ define([], function() {
         deal:
             '<div class="pgdeal-hands">' +
                 '<div class="pg-deal-buttons">' +
-                    '<div><button type="button" class="pg-deal-preview-hands btn btn-primary btn-sm">Preview Hands</button></div>' +
-                    '<div><button type="button" class="pg-deal-tiles-are-set btn btn-primary btn-sm">Tiles are Set</button></div>' +
+                    '<div><button type="button" class="pg-deal-preview-hands    btn left  btn-primary btn-sm">Preview Hands</button></div>' +
+                    '<div><button type="button" class="pg-deal-un-preview-hands btn left  btn-primary btn-sm">Unpreview Hands</button></div>' +
+                    '<div><button type="button" class="pg-deal-tiles-are-set    btn right btn-primary btn-sm">Tiles are Set</button></div>' +
+                    '<div><button type="button" class="pg-deal-next-deal        btn right btn-primary btn-sm">Next Deal</button></div>' +
+                    '<div><button type="button" class="pg-deal-anoither-game    btn right btn-primary btn-sm">Another Game</button></div>' +
                 '</div>' +
                 '<div class="pg-deal-hands">' +
                     '<span class="pg-handpoints pg-handpoints-3">3</span>' +
