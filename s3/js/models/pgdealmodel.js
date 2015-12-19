@@ -21,10 +21,10 @@ function(
         },
 
         _addModelListeners: function() {
-            this.listenTo(this, 'change:dealID', _.bind(this._fetchChanged, this));
+            this.listenTo(this, 'change:dealID', _.bind(this._dealIDChanged, this));
         },
 
-        _fetchChanged: function(model, newValue) {
+        _dealIDChanged: function(model, newValue) {
             this.fetch();
         },
 

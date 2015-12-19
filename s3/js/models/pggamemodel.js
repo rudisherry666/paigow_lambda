@@ -38,10 +38,10 @@ function(
         },
 
         _addModelListeners: function() {
-            this.listenTo(this, 'change:gameHash', _.bind(this._fetchChanged, this));
+            this.listenTo(this, 'change:gameHash', _.bind(this._hashChanged, this));
         },
 
-        _fetchChanged: function(model, newValue) {
+        _hashChanged: function(model, newValue) {
             if (newValue !== this.defaults.gameHash)  {
                 this.fetch();
             }
