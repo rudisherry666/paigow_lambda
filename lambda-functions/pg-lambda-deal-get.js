@@ -36,7 +36,9 @@ exports.handler = function(event, context) {
     })
     .then(function(deal) {
         // TODO: if the deal isn't done, don't pass down the opponent's
-        // tiles: replace them with a generic tile.
+        // tiles: replace them with a hidden tile (32)
+        var i;
+        for (i = 12; i < 24; i++) deal.tiles[i] = 32;
         context.succeed(deal);
     })
     .fail(function(err) {

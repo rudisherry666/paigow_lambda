@@ -98,7 +98,7 @@ function PGTile(tileSelector) {
     } else
         throw new Error("PGTile constructor given bad param type");
 
-    if (index < PGTile.prototype.TILE_INDEX.TEEN_1 || index > PGTile.prototype.TILE_INDEX.GEE_JOON_2) pgTileSelectorFatal("bad numeric constructor param " + index);
+    if (index < PGTile.prototype.TILE_INDEX.TEEN_1 || index > PGTile.prototype.TILE_INDEX.HIDDEN) pgTileSelectorFatal("bad numeric constructor param " + index);
     this._index = index;
     this._obj = tiles[index];
 }
@@ -125,7 +125,8 @@ PGTile.prototype.HAND_CHAR = {
     MIXED_EIGHT:  'm',
     MIXED_SEVEN:  'n',
     MIXED_FIVE:   'o',
-    GEE_JOON:     'p'
+    GEE_JOON:     'p',
+    HIDDEN:       'q'
 };
 
 /*
@@ -167,7 +168,8 @@ PGTile.prototype.TILE_INDEX = {
     MIXED_FIVE_1:   28,
     MIXED_FIVE_2:   29,
     GEE_JOON_1:     30,
-    GEE_JOON_2:     31
+    GEE_JOON_2:     31,
+    HIDDEN:         32
 };
 
 /*
@@ -191,7 +193,8 @@ PGTile.prototype.TILE_NAME = {
     MIXED_EIGHT:  'mixed eight',
     MIXED_SEVEN:  'mixed seven',
     MIXED_FIVE:   'mixed five',
-    GEE_JOON:     'gee joon'
+    GEE_JOON:     'gee joon',
+    HIDDEN:       '???'
 };
 
 
@@ -230,6 +233,7 @@ var tiles = [
     { tileName: PGTile.prototype.TILE_NAME.MIXED_FIVE,      handChar: PGTile.prototype.HAND_CHAR.MIXED_FIVE,      divClass: 'pgtile-mixed-five-2',    tileRank: 1, pairRank: 0, numericVal: 5 },
     { tileName: PGTile.prototype.TILE_NAME.GEE_JOON,        handChar: PGTile.prototype.HAND_CHAR.GEE_JOON,        divClass: 'pgtile-gee-joon-1',      tileRank: 0, pairRank:15, numericVal: 3 },
     { tileName: PGTile.prototype.TILE_NAME.GEE_JOON,        handChar: PGTile.prototype.HAND_CHAR.GEE_JOON,        divClass: 'pgtile-gee-joon-2',      tileRank: 0, pairRank:15, numericVal: 3 },
+    { tileName: PGTile.prototype.TILE_NAME.HIDDEN,          handChar: PGTile.prototype.HAND_CHAR.HIDDEN,          divClass: 'pgtile-hidden',          tileRank:-1, pairRank:-1, numericVal:-1 },
 ];
 
 /*

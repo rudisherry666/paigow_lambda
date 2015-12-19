@@ -163,7 +163,8 @@ var HANDS = {
 /*  high eight    / high eight    */   'cc': { rank: 102, value: 24, name: "bo" },
 /*  day           / day           */   'bb': { rank: 103, value: 25, name: "bo" },
 /*  teen          / teen          */   'aa': { rank: 104, value: 26, name: "bo" },
-/*  gee joon      / gee joon      */   'pp': { rank: 105, value: 27, name: "gee joon" }
+/*  gee joon      / gee joon      */   'pp': { rank: 105, value: 27, name: "gee joon" },
+/*  hidden        / hidden        */   'qq': { rank:  -1, value: -1, name: "???" }
 };
 
 /*
