@@ -25,7 +25,7 @@ define([
             this._addModelListeners();
         },
 
-        _addModelListeners: function() {},
+        _addModelListeners: function() {}
 
     });
 

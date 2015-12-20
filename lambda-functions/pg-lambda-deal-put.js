@@ -36,15 +36,15 @@ exports.handler = function(event, context) {
                 error: 'Bad player supplied for putting deal',
                 code: 'PG_ERROR_BAD_PLAYER_PARAMETER'
             });
-        } else if (!event.action) {
+        } else if (!event.state) {
             defer.reject({
-                error: 'No action supplied for putting deal',
-                code: 'PG_ERROR_MISSING_ACTION_PARAMETER'
+                error: 'No state supplied for putting deal',
+                code: 'PG_ERROR_MISSING_STATE_PARAMETER'
             });
-        } else if (["tiles_are_set", "ready_for_next_deal"].indexOf(event.action) < 0) {
+        } else if (["tiles_are_set", "ready_for_next_deal"].indexOf(event.state) < 0) {
             defer.reject({
-                error: 'Bad action supplied for putting deal',
-                code: 'PG_ERROR_BAD_ACTION_PARAMETER'
+                error: 'Bad state supplied for putting deal',
+                code: 'PG_ERROR_BAD_STATE_PARAMETER'
             });
         } else if (event.action == "tiles_are_set" &&
                    (!event.tiles ||
@@ -225,10 +225,10 @@ exports.handler = function(event, context) {
         console.log('got deal');
         console.log(dbDeal);
 
-        // Depending on the action, we update the deal.
-        if (event.action === 'tiles_are_set') {
+        // Depending on the payload, we update the deal.
+        if (event.state === 'tiles_are_set') {
             return setTiles(dbDeal);
-        } else if (event.action === 'ready_for_next_deal') {
+        } else if (event.state === 'ready_for_next_deal') {
             return addAnotherDeal(dbDeal);
         }
     })

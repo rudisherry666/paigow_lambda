@@ -60,7 +60,6 @@ define([
             }
 
             _.each(o.pgHandViews, function(pgHandView) {
-                o.pgHandViews.push(pgHandView);
                 pgHandView.render();
             });
 
@@ -78,10 +77,14 @@ define([
         _addModelListeners: function() {
             var o = this._options;
 
-            // If the state changes as a result of clicking one of the buttons,
-            // update the state of the buttons.
-            this.listenTo(o.pgDealUIModel, 'change:state',
-                this._onDealStateChange);
+            if (o.isPlayer) {
+                // If the state changes as a result of clicking one of the buttons,
+                // update the state of the buttons.
+                this.listenTo(o.pgDealUIModel, 'change:state',
+                    this._onDealStateChange);
+
+                this.listenTo(o.eventBus, 'deal:tiles_are_set', this._onTilesSet);
+            }
 
             return this._super();
         },
@@ -143,6 +146,18 @@ define([
                     o.eventBus.trigger('deal:ready_for_next_game');
                 break;
             }
+        },
+
+        _onTilesSet: function() {
+            var o = this._options,
+                tileIndexes = o.pgHandViews.reduce(function(prev, cur) {
+                    return prev.concat(cur.tileIndexes());
+                }, []);
+
+            o.pgDealModel.set({
+                tiles: tileIndexes,
+                state: o.pgDealUIModel.get('state')
+            }).save();
         },
 
         // -------------------------------------------------------

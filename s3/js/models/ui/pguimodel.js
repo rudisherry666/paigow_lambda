@@ -6,7 +6,8 @@
 */
 
 define([
-    'backbone'
+    'backbone',
+    'backbone-super'
 ], function(
     Backbone
 ) {

@@ -33,6 +33,10 @@ function(
             return '/game/' + this.gameHash() + '/deal/' + this.dealIndex() + '/player';
         },
 
+        toJSON: function() {
+            return _.pick(this.attributes, 'tiles', 'state');
+        },
+
         // Convenience functions
         gameHash: function() {
             return this.get('dealID').split('#')[0];

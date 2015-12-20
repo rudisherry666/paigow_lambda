@@ -66,6 +66,8 @@ define([
                     if (config.mock) {
                         console.log('Mock save -- should not be called!');
                     } else {
+                        method = method || 'update';
+                        model = model || this;
                         options = this.addSessionHashHeader(options);
                         superclass.prototype.save.call(this, method, model, options);
                     }

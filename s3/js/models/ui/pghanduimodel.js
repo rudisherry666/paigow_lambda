@@ -8,16 +8,16 @@
 */
 
 define([
-    'backbone',
+    'models/ui/pguimodel',
     'classes/pghand',
     'classes/pgstrategy'
 ], function(
-    Backbone,
+    PGUIModel,
     PGHand,
     PGStrategy
 ) {
     
-    var PGHandUIModel = Backbone.Model.extend({
+    var PGHandUIModel = PGUIModel.extend({
 
         // Startup
         initialize: function(options) {
