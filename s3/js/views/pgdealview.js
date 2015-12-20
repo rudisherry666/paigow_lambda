@@ -67,7 +67,7 @@ define([
             if (o.isPlayer) {
                 this._setClass('pg-deal-thinking');
             } else {
-                this._setClass('pg-deal-opponent pg-hidden-hand');
+                this._setClass('pg-deal-opponent pg-hidden-hands');
             }
 
             return this._super();
@@ -84,6 +84,8 @@ define([
                     this._onDealSituationChange);
 
                 this.listenTo(o.eventBus, 'deal:tiles_are_set', this._onTilesSet);
+            } else {
+                this.listenTo(o.pgDealModel, 'sync', this._onDealSync);
             }
 
             return this._super();
@@ -174,6 +176,20 @@ define([
                     console.log(response);
                 }, this),
             });
+        },
+
+        _onDealSync: function(model, deal) {
+            var o = this._options;
+
+            if (deal.situation === 'FINISHED') {
+                // Make sure we can shown the tiles.
+                this.$el.removeClass('pg-hidden-hands');
+
+                // Reset the tile indexes for the hands.
+                _.each(o.pgHandViews, function(pgHandView, index) {
+                    pgHandView.setTileIndexes(deal.tiles.slice(12+(index*4), 12+((index+1)*4)));
+                });
+            }
         },
 
         // -------------------------------------------------------
