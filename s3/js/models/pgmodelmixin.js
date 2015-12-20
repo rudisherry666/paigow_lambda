@@ -62,14 +62,21 @@ define([
                         superclass.prototype.sync.call(this, method, model, options);
                     }
                 },
-                save: function(method, model, options) {
+                save: function(key, val, options) {
                     if (config.mock) {
                         console.log('Mock save -- should not be called!');
                     } else {
-                        method = method || 'update';
-                        model = model || this;
-                        options = this.addSessionHashHeader(options);
-                        superclass.prototype.save.call(this, method, model, options);
+                        if (typeof key === 'string') {
+                            // params are (key, val, [options])
+                            options = this.addSessionHashHeader(options);
+                        } else if (_.isUndefined(val)) {
+                            // params are (options), use 'key'
+                            key = this.addSessionHashHeader(key);
+                        } else {
+                            // params are (attributes, options), use 'val'
+                            val = this.addSessionHashHeader(val);
+                        }
+                        superclass.prototype.save.call(this, key, val, options);
                     }
                 },
 
