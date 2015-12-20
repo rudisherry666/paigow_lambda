@@ -14,7 +14,7 @@ define([
     
     var PGGameUIModel = PGUIModel.extend({
 
-        states: {
+        situations: {
             READY_FOR_NEXT_DEAL:    'READY_FOR_NEXT_DEAL',
             JUST_DEALT:             'JUST_DEALT',
             NEW_DEAL_ASKED_FOR:     'NEW_DEAL_ASKED_FOR',

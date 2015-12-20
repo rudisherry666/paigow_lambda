@@ -78,10 +78,10 @@ define([
             var o = this._options;
 
             if (o.isPlayer) {
-                // If the state changes as a result of clicking one of the buttons,
+                // If the situation changes as a result of clicking one of the buttons,
                 // update the state of the buttons.
-                this.listenTo(o.pgDealUIModel, 'change:state',
-                    this._onDealStateChange);
+                this.listenTo(o.pgDealUIModel, 'change:situation',
+                    this._onDealSituationChange);
 
                 this.listenTo(o.eventBus, 'deal:tiles_are_set', this._onTilesSet);
             }
@@ -99,28 +99,28 @@ define([
 
         // User clicked 'Preview Handls'
         _previewHands: function(e) {
-            this._setDealState('previewing');
+            this._setDealSituation('previewing');
         },
 
         _unPreviewHands: function(e) {
-            this._setDealState('thinking');
+            this._setDealSituation('thinking');
         },
 
         _tilesAreSet: function(e) {
-            this._setDealState('tiles_are_set');
+            this._setDealSituation('tiles_are_set');
         },
 
         _nextDeal: function(e) {
-            this._setDealState('ready_for_next_deal');
+            this._setDealSituation('ready_for_next_deal');
         },
 
         _anotherGame: function(e) {
-            this._setDealState('ready_for_next_game');
+            this._setDealSituation('ready_for_next_game');
         },
 
-        _onDealStateChange: function(model, newState) {
+        _onDealSituationChange: function(model, newSituation) {
             var o = this._options;
-            switch (newState) {
+            switch (newSituation) {
                 case 'tiles_are_set':
                     this._setClass('pg-deal-tiles-are-set');
                     o.eventBus.trigger('deal:tiles_are_set');
@@ -156,8 +156,24 @@ define([
 
             o.pgDealModel.set({
                 tiles: tileIndexes,
-                state: o.pgDealUIModel.get('state')
-            }).save();
+                situation: o.pgDealUIModel.get('situation')
+            }).save({}, {
+                success: _.bind(function(model, response, options) {
+                    // The tiles hav been updated, during 'save', with the
+                    // actual opponent's tiles -- if the opponent is ready.
+                    // We know the opponent is ready because the deal situate
+                    // will be 'FINISHED'.
+                    if (model.get('situation') === 'FINISHED') {
+
+                    } else {
+                        // TODO: if the opponent is not ready we need to poll
+                        // until (s)he is.
+                    }
+                }, this),
+                error: _.bind(function(model, response, options) {
+                    console.log(response);
+                }, this),
+            });
         },
 
         // -------------------------------------------------------
@@ -168,9 +184,9 @@ define([
                     .addClass(newClass);
         },
 
-        _setDealState: function(newState) {
+        _setDealSituation: function(newSituation) {
             var o = this._options;
-            o.pgDealUIModel.set('state', newState);
+            o.pgDealUIModel.set('situation', newSituation);
         },
 
         _switchHandsEx: function(whichHand) {

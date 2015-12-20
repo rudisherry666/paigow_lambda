@@ -36,15 +36,15 @@ exports.handler = function(event, context) {
                 error: 'Bad player supplied for putting deal',
                 code: 'PG_ERROR_BAD_PLAYER_PARAMETER'
             });
-        } else if (!event.state) {
+        } else if (!event.situation) {
             defer.reject({
-                error: 'No state supplied for putting deal',
-                code: 'PG_ERROR_MISSING_STATE_PARAMETER'
+                error: 'No situation supplied for putting deal',
+                code: 'PG_ERROR_MISSING_SITUATION_PARAMETER'
             });
-        } else if (["tiles_are_set", "ready_for_next_deal"].indexOf(event.state) < 0) {
+        } else if (["tiles_are_set", "ready_for_next_deal"].indexOf(event.situation) < 0) {
             defer.reject({
-                error: 'Bad state supplied for putting deal',
-                code: 'PG_ERROR_BAD_STATE_PARAMETER'
+                error: 'Bad situation supplied for putting deal',
+                code: 'PG_ERROR_BAD_SITUATION_PARAMETER'
             });
         } else if (event.action == "tiles_are_set" &&
                    (!event.tiles ||
@@ -68,16 +68,11 @@ exports.handler = function(event, context) {
     function arraysNumbersMatch(a, b) {
         a.sort();
         b.sort();
-        console.log('matching:');
-        console.log(a.toString());
-        console.log(b.toString());
         for (i = 0; i < a.length; i++) {
             if (a[i] !== b[i]) {
-                console.log('no match!');
                 return false;
             }
         }
-        console.log('match!');
         return true;
     }
 
@@ -87,9 +82,6 @@ exports.handler = function(event, context) {
     function sortHands(h1, h2) {
         var s1 = h1.reduce(sum),
             s2 = h2.reduce(sum);
-
-        console.log('array length: ', h1.length);
-        console.log('s1: ' + s1, '; s2: ' + s2);
 
         // Add up all the indexes, sort by that.
         if (s1 > s2)
@@ -165,7 +157,11 @@ exports.handler = function(event, context) {
             // re-arrangement of the original deal's tiles.
             Array.prototype.splice.apply(dbDeal.tiles, [0, 12].concat(event.tiles.slice(0,12)));
             dbDeal.tiles.slice(event.tiles, 0, 12);
-            dbDeal.situation = "TILES_ARE_SET";
+
+            // TODO: if the opponent is the computer, set the tiles; if the
+            // opponent is another player, we need to see if they're set.
+            // For now, assume it's computer and the tiles are set.
+            dbDeal.situation = "FINISHED";
             console.log('spliced tiles in');
             console.log(dbDeal);
             deal = dbDeal;
@@ -226,9 +222,9 @@ exports.handler = function(event, context) {
         console.log(dbDeal);
 
         // Depending on the payload, we update the deal.
-        if (event.state === 'tiles_are_set') {
+        if (event.situation === 'tiles_are_set') {
             return setTiles(dbDeal);
-        } else if (event.state === 'ready_for_next_deal') {
+        } else if (event.situation === 'ready_for_next_deal') {
             return addAnotherDeal(dbDeal);
         }
     })

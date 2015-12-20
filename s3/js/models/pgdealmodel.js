@@ -34,7 +34,7 @@ function(
         },
 
         toJSON: function() {
-            return _.pick(this.attributes, 'tiles', 'state');
+            return _.pick(this.attributes, 'tiles', 'situation');
         },
 
         // Convenience functions

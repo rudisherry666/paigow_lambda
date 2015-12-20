@@ -29,7 +29,7 @@ define([
             o.pgGameUIModel = new PGGameUIModel({ eventBus: o.eventBus });
             o.pgDealModel = new PGDealModel({
                 eventBus: o.eventBus,
-                state: 'thinking'
+                situation: 'thinking'
             });
 
             return this._super();
@@ -41,9 +41,8 @@ define([
 
             this.listenTo(o.pgDealModel, 'sync', this._show);
 
-            // this.listenTo(o.playerDealModel, 'change:state', this._handleDealState);
             this.listenTo(o.pgGameModel, 'change:score', this._updateScore);
-            this.listenTo(o.pgGameUIModel, 'change:state', this._onGameStateChange);
+            this.listenTo(o.pgGameUIModel, 'change:situation', this._onGameSituationChange);
 
             this.listenTo(o.eventBus, 'deal:tiles_are_set', this._tilesAreSet);
 
@@ -103,14 +102,12 @@ define([
             _.each(this._dealViews, function(dealView) { dealView.render(); });
         },
 
-        _onGameStateChange: function(model, newState) {
-            var o = this._options,
-                states = o.pgGameUIModel.state;
+        _onGameSituationChange: function(model, newSituation) {
 
             // We're in "no" state now.
             this.$el.removeClass('pg-game-making-room pg-game-ready-for-next-deal pg-game-comparing-hands pg-game-dealing-tiles pg-game-setting-tiles');
 
-            switch (newState) {
+            switch (newSituation) {
                 case states.READY_FOR_NEXT_DEAL:
                     this.$el.addClass('pg-game-ready-for-next-deal');
                 break;
@@ -136,7 +133,7 @@ define([
         _handleDealState: function() {
             var o = this._options;
 
-            switch (o.pgDealModel.get('state')) {
+            switch (o.pgDealModel.get('situation')) {
 
                 case 'thinking':
                 case 'previewing':

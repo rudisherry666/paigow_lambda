@@ -41,9 +41,9 @@ define([
 
             this.listenTo(h, 'change:tileIndexes', this._tilesChanged);
             this.listenTo(o.eventBus, 'deal:tiles_are_set', this._tilesAreSet);
-            this.listenTo(o.pgDealUIModel, 'change:state', this._dealStateChanged);
+            this.listenTo(o.pgDealUIModel, 'change:situation', this._dealSituationChanged);
 
-            h.set('state', 'thinking');
+            h.set('situation', 'thinking');
 
             return this._super();
         },
@@ -127,22 +127,22 @@ define([
         _unpreviewHand: function() {
         },
 
-        _dealStateChanged: function(model, state) {
+        _dealSituationChanged: function(model, situation) {
             var o = this._options,
                 h = o.pgHandUIModel,
                 twoTile = this.$('.pg2tile>div')[1];
-            switch (state) {
+            switch (situation) {
                 case 'thinking':
-                    if (h.get('state') == 'previewing') {
+                    if (h.get('situation') == 'previewing') {
                         PGBrowserUtils.animateRotate($(twoTile), 90, 0);
-                        h.set('state', 'thinking');
+                        h.set('situation', 'thinking');
                     }
                 break;
 
                 case 'previewing':
-                    if (h.get('state') == 'thinking') {
+                    if (h.get('situation') == 'thinking') {
                         PGBrowserUtils.animateRotate($(twoTile), 0, 90);
-                        h.set('state', 'previewing');
+                        h.set('situation', 'previewing');
                     }
                 break;
             }
