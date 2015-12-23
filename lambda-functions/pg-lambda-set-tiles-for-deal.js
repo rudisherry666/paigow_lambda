@@ -166,7 +166,7 @@ exports.handler = function(event, context) {
         deal = setTilesForDeal(dbDeal);
         console.log(deal);
 
-        // return dbUtils.putItem(dynamodb, 'deal', deal);
+        return dbUtils.putItem(dynamodb, 'deal', deal);
     })
     .then(function() {
         console.log('set-tiles success!');
