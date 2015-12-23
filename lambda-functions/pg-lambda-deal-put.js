@@ -76,29 +76,6 @@ exports.handler = function(event, context) {
         return true;
     }
 
-    function sum(prev, cur, index, array) {
-        return prev + cur;
-    }
-    function sortHands(h1, h2) {
-        var s1 = h1.reduce(sum),
-            s2 = h2.reduce(sum);
-
-        // Add up all the indexes, sort by that.
-        if (s1 > s2)
-            return 1;
-        if (s1 < s2)
-            return -1;
-
-        // The sum of the indexes are the same.  Remove the last tile and
-        // sort by the sum again.
-        if (h1.length > 1)
-            return sortHands(h1.slice(0, h1.length-1), h2.slice(0, h2.length-1));
-
-        // We have only one tile left and it's the same: the two hands are
-        // identical so it doesn't matter which one.  Return equal.
-        return 0;
-    }
-
     // Verify that the tiles in the event match those in the deal.
     function checkTiles(dt, et) {
         var defer = q.defer(), i;
@@ -128,8 +105,8 @@ exports.handler = function(event, context) {
                 et.slice(4, 8),
                 et.slice(8, 12)
             ];
-        d.sort(sortHands);
-        e.sort(sortHands);
+        d.sort(utils.compareArraysBySum);
+        e.sort(utils.compareArraysBySum);
 
         // Theoretically now, d and e should be identical.
         for (i = 0; i < 3; i++) {
