@@ -5,10 +5,6 @@ var q = require('q'),
     dynamodb, session;
 
 exports.handler = function(event, context) {
-    var response;
-
-    // Set below
-    var session, player, opponent, game, deal;
 
     console.log('pg-lambda-set-tiles-for-deal');
     console.log(event);
@@ -27,41 +23,54 @@ exports.handler = function(event, context) {
         return defer.promise;
     }
 
-    // function addAnotherDeal() {
-    //     var defer = q.defer();
-        
-    //     dbDeal.situation = "DONE";
-    //     dbUtils.putItem(dynamodb, 'deal', deal)
-    //     .then(function() {
-    //         console.log('Deal is done, creating new deal');
-    //         deal = pg.newDeal(event.gameHash, event.dealIndex + 1);
+    function compareHands(hand1, hand2) {
+        // TODO: Here is some real work
+        return utils.compareArraysBySum(hand1, hand2);
+    }
 
-    //         // This goes in several steps.
-    //         console.log(deal);
+    function setTilesForHand(tiles, ih) {
+        var start = 12 + (ih * 4),
+            handTiles = tiles.slice(start, start + 4);
 
-    //         return dbUtils.putItem(dynamodb, 'deal', deal);
-    //     })
-    //     .then(function() {
-    //         console.log('New deal is saved, updating game');
-    //         return dbUtils.getItem(dynamodb, 'game', 'gameHash', event.gameHash);
-    //     })
-    //     .then(function(game) {
-    //         console.log('Got game for deal, updating deal index');
-    //         game.lastDealIndex = deal.dealIndex;
-    //         return dbUtils.putItem(dynamodb, 'game', game);
-    //     })
-    //     .then(function() {
-    //         console.log('addAnotherDeal succeeded.');
-    //         defer.resolve();
-    //     })
-    //     .fail(function(err) {
-    //         console.log('addAnotherDeal failed');
-    //         console.log(err);
-    //         defer.reject(err);
-    //     });
+        console.log('hand before sorting:');
+        console.log(handTiles);
 
-    //     return defer.promise;
-    // }
+        // TODO: here is more real work.
+        handTiles.sort(function(a, b) {
+            return (a > b) ? 1 : ((a < b) ? -1 : 0);
+        });
+
+        console.log('hand after sorting:');
+        console.log(handTiles);
+
+        return handTiles;
+    }
+
+    function setTilesForDeal(deal) {
+        console.log('computer tiles before sorting:');
+        console.log(deal.tiles.slice(12, 24));
+
+        // Make the three hands the best we can.
+        var ih, computerHands = [];
+        for (ih = 0; ih < 3; ih++) {
+            computerHands.push(setTilesForHand(deal.tiles, ih));
+        }
+
+        // Sort the three hands
+        computerHands.sort(compareHands);
+        var computerTiles = computerHands[0]
+            .concat(computerHands[1])
+            .concat(computerHands[2]);
+
+        Array.prototype.splice.apply(deal.tiles, [12, 12].concat(computerTiles));
+        console.log('computer tiles after sorting:');
+        console.log(deal.tiles.slice(12, 24));
+
+        // Computer is always the opponent.
+        deal.situation.opponent = 'TILES_ARE_SET';
+
+        return deal;
+    }
 
     // Actually do the work, now that all the functions have been created.
     dynamodb = new (require('dynamodb-doc')).DynamoDB();
@@ -76,11 +85,9 @@ exports.handler = function(event, context) {
     })
     .then(function(dbDeal) {
         console.log('Setting computer tiles for deal');
+        console.log(dbDeal);
 
-        // TODO: do it here.
-        // deal = setTilesForDeal(dbDeal);
-
-        deal = dbDeal;
+        deal = setTilesForDeal(dbDeal);
         console.log(deal);
 
         return dbUtils.putItem(dynamodb, 'deal', deal);
