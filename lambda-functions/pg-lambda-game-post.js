@@ -63,7 +63,7 @@ exports.handler = function(event, context) {
         game = {
             gameHash: utils.newRandomID(),
             players: player.username + '|' + opponent.username,
-            situation: 'CREATED',
+            situation: event.opponent === 'computer' ? 'IN_PROGRESS' : 'CREATED',
             startTime: new Date().getTime(),
             score: [0, 0],
             lastDealIndex: 0
