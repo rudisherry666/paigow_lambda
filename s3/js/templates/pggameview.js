@@ -33,15 +33,15 @@ define([], function() {
         hand:
             '<div class="pghand-tiles">' +
                 '<span class="pg-tile-manipulate-control pgtexticon rotatetiles-btn">&#10226;</span>' +
-                '<div class="pg2tile">' +
+                '<div class="pg2tile pg-high-hand">' +
                     '<div>' +
                         '<div class="pgtile"></div>' +
-                        '<div class="pgtile"></div>' +
+                        '<div class="pgtile pg-low-hand"></div>' +
                     '</div>' +
                     '<span class="pg2tile-label"></span>' +
                 '</div>' +
                 '<div class="pgtile-spacer"></div>' +
-                '<div class="pg2tile">' +
+                '<div class="pg2tile pg-low-hand">' +
                     '<div>' +
                         '<div class="pgtile"></div>' +
                         '<div class="pgtile"></div>' +

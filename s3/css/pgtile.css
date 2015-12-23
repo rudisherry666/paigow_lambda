@@ -38,12 +38,16 @@
     display: none;
 }
 
-.pg-hidden-hand .pgdot {
+.pg-hidden-hands .pgdot {
     display: none !important;
 }
 
 .pg-loser .pgdot, .pg-push .pgdot {
     opacity: 0.5;
+}
+
+.pg-deal-opponent:not(.pg-hidden-hands) .pg-low-hand > div {
+    transform: rotate(90deg);
 }
 
 /* ----------- TEEN ----------- */

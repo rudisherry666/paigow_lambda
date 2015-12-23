@@ -138,7 +138,7 @@ define([
                 case 'thinking':
                 case 'previewing':
                     // Make sure the computer hand is hidden
-                    $(".pg-deal-opponent").addClass("pg-hidden-hand");
+                    $(".pg-deal-opponent").addClass("pg-hidden-hands");
 
                     // All point-nums back to normal.
                     this.$el.find('.pg-handpoints, .pghand').removeClass("pg-winner pg-loser pg-push");
