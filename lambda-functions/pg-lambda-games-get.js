@@ -1,6 +1,7 @@
 var q = require('q'),
     utils = require('general-utils'),
     dbUtils = require('db-utils'),
+    aws = require('aws-sdk'),
     dynamodb, session;
 
 exports.handler = function(event, context) {
@@ -9,14 +10,14 @@ exports.handler = function(event, context) {
     console.log('pg-lambda-games-get');
     console.log(event);
 
+    dynamodb = dbUtils.getDynamoDB();
+
     // All we need is a valid session and player: this will resolve
     // with the player or reject.
     function validateRequest() {
         return dbUtils.validatePlayer(dynamodb, event.sessionHash);
     }
 
-    // Actually do the work, now that all the functions have been created.
-    dynamodb = new (require('dynamodb-doc')).DynamoDB();
     validateRequest()
     .then(function(player) {
         console.log('Have player, calling dynamodb.query');
