@@ -5,13 +5,12 @@ var q = require('q'),
     dynamodb, session;
 
 exports.handler = function(event, context) {
-    var response;
-
-    // Set below
     var session, player, opponent, game, deal;
 
     console.log('pg-lambda-deal-put');
     console.log(event);
+
+    dynamodb = dbUtils.getDynamoDB();
 
     function validateRequest() {
         var defer = q.defer(),
@@ -183,7 +182,6 @@ exports.handler = function(event, context) {
     }
 
     // Actually do the work, now that all the functions have been created.
-    dynamodb = new (require('dynamodb-doc')).DynamoDB();
     validateRequest()
     .then(function() {
         return dbUtils.validateSession(dynamodb, event.sessionHash);

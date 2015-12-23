@@ -4,10 +4,11 @@ var q = require('q'),
     dynamodb, session;
 
 exports.handler = function(event, context) {
-    var response;
 
     console.log('pg-lambda-player-get');
     console.log(event);
+
+    dynamodb = dbUtils.getDynamoDB();
 
     function validateRequest() {
         return dbUtils.validatePlayer(dynamodb, event.sessionHash);

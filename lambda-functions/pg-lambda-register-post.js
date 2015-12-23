@@ -178,7 +178,7 @@ exports.handler = function(event, context) {
 
     // Actually do the work, now that all the functions have been created.
     validateRequest().then(function() {
-        dynamodb = new (require('dynamodb-doc')).DynamoDB();
+        dynamodb = dbUtils.getDynamoDB();
         return dbUtils.verifyDescribeTable(dynamodb, 'player');
     }).then(function() {
         return dbUtils.getItem(dynamodb, 'player', 'username', event.username);

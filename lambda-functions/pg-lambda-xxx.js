@@ -4,10 +4,11 @@ var q = require('q'),
     dynamodb, session;
 
 exports.handler = function(event, context) {
-    var response;
 
     console.log('pg-lambda-xxx');
     console.log(event);
+
+    dynamodb = dbUtils.getDynamoDB();
 
     function validateRequest() {
         var defer = q.defer();
@@ -18,7 +19,6 @@ exports.handler = function(event, context) {
     }
 
     // Actually do the work, now that all the functions have been created.
-    dynamodb = new (require('dynamodb-doc')).DynamoDB();
     validateRequest()
     .then(function() {
         context.succeed('xxx');

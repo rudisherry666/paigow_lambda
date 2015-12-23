@@ -9,6 +9,8 @@ exports.handler = function(event, context) {
     console.log('pg-lambda-game-get');
     console.log(event);
 
+    dynamodb = dbUtils.getDynamoDB();
+
     function validateRequest() {
         var defer = q.defer();
         if (!event.gameHash) {
@@ -23,7 +25,6 @@ exports.handler = function(event, context) {
     }
 
     // Actually do the work, now that all the functions have been created.
-    dynamodb = new (require('dynamodb-doc')).DynamoDB();
     validateRequest()
     .then(function() {
         return dbUtils.getItem(dynamodb, 'game', 'gameHash', event.gameHash);
