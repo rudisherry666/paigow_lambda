@@ -2,6 +2,7 @@ var q = require('q'),
     utils = require('general-utils'),
     dbUtils = require('db-utils'),
     pg = require('pg'),
+    aws = require('aws-sdk'),
     dynamodb, session;
 
 exports.handler = function(event, context) {
@@ -80,6 +81,45 @@ exports.handler = function(event, context) {
         // Game and deal have been created.  Put that info into the session.
         session.gameHash = game.gameHash;
         return dbUtils.putItem(dynamodb, 'session', session);
+    })
+    .then(function() {
+        var defer = q.defer();
+
+        console.log('setting if we have to set tiles for opponent: ' + event.opponent);
+
+        // If we're playing against the computer, it needs to set its tiles.
+        if (event.opponent !== 'computer') return true;
+
+        console.log('seting tiles for opponent: ' + event.opponent);
+        var lambda = new aws.Lambda();
+        console.log('added lambda: ' + lambda);
+        var params = {
+            FunctionName: 'pg-lambda-set-tiles-for-deal',
+            // ClientContext: 'STRING_VALUE',
+            InvocationType: 'Event', // 'Event | RequestResponse | DryRun',
+            LogType: 'None', // 'None | Tail',
+            Payload: // new Buffer('...') || 'STRING_VALUE',
+                JSON.stringify({
+                    sessionHash: event.sessionHash,
+                    dealID: deal.dealID
+                })
+            // Qualifier: 'STRING_VALUE'
+        };
+        console.log('created params:');
+        console.log(params);
+        lambda.invoke(params, function(err, data) {
+            if (err) {
+                console.log('Lambda error:');
+                console.log(err, err.stack); // an error occurred
+                defer.resolve();    // TODO: wtf do we do here?
+            } else {
+                console.log('Lambda success:');
+                console.log(data);           // successful response
+                defer.resolve();
+            }
+        });
+
+        return defer.promise;
     })
     .then(function() {
         // All success! Return the game ID.
