@@ -146,12 +146,14 @@ define([
                 case 'thinking':
                     this._setClass('pg-deal-thinking');
                     this.$el.removeClass('pg-no-manipulate pg-deal-hidden-hands');
+                    o.eventBus.trigger('deal:thinking');
                 break;
 
                 case 'previewing':
                     this._setClass('pg-deal-previewing');
                     this.$el.addClass('pg-no-manipulate')
                             .removeClass('pg-deal-hidden-hands');
+                    o.eventBus.trigger('deal:previewing');
                 break;
 
                 case 'deal-done':

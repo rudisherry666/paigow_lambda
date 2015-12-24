@@ -40,7 +40,7 @@ define([
                 h = o.pgHandUIModel;
 
             this.listenTo(h, 'change:tileIndexes', this._tilesChanged);
-            this.listenTo(o.eventBus, 'deal:tiles_are_set', this._tilesAreSet);
+            this.listenTo(o.eventBus, 'deal:previewing', this._previewing);
             this.listenTo(o.pgDealUIModel, 'change:situation', this._dealSituationChanged);
 
             h.set('situation', 'thinking');
@@ -98,7 +98,7 @@ define([
             h.set('tileIndexes', tileIndexes);
         },
 
-        _tilesAreSet: function(options) {
+        _previewing: function() {
             var o = this._options,
                 h = o.pgHandUIModel,
                 tileIndexes = h.get('tileIndexes').slice(0);
