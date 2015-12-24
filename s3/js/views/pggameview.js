@@ -40,12 +40,7 @@ define([
             var o = this._options;
 
             this.listenTo(o.pgDealModel, 'sync', this._show);
-
-            this.listenTo(o.pgGameModel, 'change:score', this._updateScore);
             this.listenTo(o.pgGameUIModel, 'change:situation', this._onGameSituationChange);
-
-            this.listenTo(o.eventBus, 'deal:tiles_are_set', this._tilesAreSet);
-            this.listenTo(o.eventBus, 'deal:opponent_tiles_are_set', this._opponentTilesAreSet);
 
             return this._super();
         },
@@ -129,22 +124,7 @@ define([
                     }, this), 2000);
                 break;
             }
-        },
-
-        _opponentTilesAreSet: function() {
-            var o = this._options;
-            $('.pg-deal-opponent').addClass('pg-hands-set');
-        },
-
-        // The player has set their tiles
-        _tilesAreSet: function() {
-            // TBD.
-        },
-
-        _updateScore: function() {
-            var o = this._options;
-        },
-
+        }
     });
 
     return PGGameView;
