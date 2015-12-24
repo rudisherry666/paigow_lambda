@@ -50,51 +50,20 @@ exports.handler = function(event, context) {
     .then(function(deal) {
         var i, retDeal;
 
-        console.log('got deal: ' + deal);
-        console.log('looking at player "' + event.player + '"' );
+        console.log('got deal:');
+        console.log(deal);
 
-        // We return different things depending on what's asked for.
-        switch (event.player) {
-            case "both":
-                // Everything is wanted: if the deal isn't finished, this is
-                // an error.
-                if (deal.situation.player !== 'TILES_ARE_SET' ||
-                        deal.situation.opponent !== 'TILES_ARE_SET') {
-                    console.log('Not returning both because deal is not done');
-                    return q.reject({
-                        error: 'Deal not done, cannot return info',
-                        code: 'PG_ERROR_DEAL_NOT_DONE_FOR_BOTH'
-                    });
-                }
-                retDeal = deal;
-            break;
+        retDeal = {
+            tiles: deal.tiles,
+            situation: deal.situation,
+            points: deal.points
+        };
 
-            case "player":
-                // Just want the players tiles.  Always OK.
-                retDeal = {
-                    tiles: deal.tiles,
-                    situation: deal.situation
-                };
-                for (i = 12; i < 24; i++) retDeal.tiles[i] = 32;
-            break;
-
-            case "opponent":
-                // Opponents tiles can't be returned until the player is set.
-                if (deal.situation.player !== 'TILES_ARE_SET' ||
-                        deal.situation.opponent !== 'TILES_ARE_SET') {
-                    console.log('Not returning opponent because deal is not done');
-                    return q.reject({
-                        error: 'Deal not done, cannot return info',
-                        code: 'PG_ERROR_DEAL_NOT_DONE_FOR_OPPONENT'
-                    });
-                }
-
-                // Just return the tiles.
-                retDeal = {
-                    tiles: deal.tiles,
-                    situation: deal.situation
-                };
-            break;
+        // Cloak the opponent's tiles if both players haven't set yet.
+        if (deal.situation.player !== 'TILES_ARE_SET' ||
+                deal.situation.opponent !== 'TILES_ARE_SET') {
+            console.log('cloaking opponent tiles');
+            for (i = 12; i < 24; i++) retDeal.tiles[i] = 32;
         }
         context.succeed(retDeal);
     })
