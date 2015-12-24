@@ -235,12 +235,27 @@ function firstSetIsBetter(set1, set2) {
 
     if ('valDiff' in sd1 && 'valDiff' in sd2 && sd1.valDiff !== sd2.valDiff) {
         pgStrategyLog("... using value diffs of " + sd1.valDiff + " and " + sd2.valDiff);
-        return (sd1.valDiff < sd2.valudDiff);
+        if (sd1.valDiff < sd2.valDiff) {
+            console.log('first set is better');
+        } else if (sd1.valDiff > sd2.valDiff) {
+            console.log('second set is better');
+        } else {
+            console.log('sets are even, using second set');
+        }
+        return (sd1.valDiff < sd2.valDiff);
     }
 
     // no only way: check for diffs;
     //return set1.sumAndDiff().diff < set2.sumAndDiff().diff;
     // no only way: check for sums;
+    pgStrategyLog("... using hand sums of " + set1.sumAndDiff().sum + " and " + set2.sumAndDiff().sum);
+    if (set1.sumAndDiff().sum > set2.sumAndDiff().sum) {
+        console.log('first set is better');
+    } else if (set1.sumAndDiff().sum < set2.sumAndDiff().sum) {
+        console.log('second set is better');
+    } else {
+        console.log('sets are even, using first set');
+    }
     return set1.sumAndDiff().sum > set2.sumAndDiff().sum;
 }
 
@@ -296,7 +311,13 @@ function PGStrategy(args) {
     }
     if (tiles.length !== 4) pgStrategyFatal("wrong number of params");
     for (var ti = 0; ti < tiles.length; ti++) {
-        if (!(tiles[ti] instanceof PGTile)) pgStrategyFatal("argument not a PGTile");
+        if (!(tiles[ti] instanceof PGTile)) {
+            if (typeof tiles[ti] !== 'number') {
+                pgStrategyFatal("argument not a PGTile or Number");
+            } else {
+                tiles[ti] = new PGTile(tiles[ti]);
+            }
+        }
     }
 
     // Create the three possible variations of the hand.  Each PGSet contructor
@@ -356,6 +377,9 @@ PGStrategy.prototype._pickedOrderingForSets = function() {
     pickedOrdering = undefined;
 
     var sets = this._sets;
+    pgStrategyLog("set 1: " + sets[1]);
+    pgStrategyLog("set 2: " + sets[2]);
+    pgStrategyLog("set 3: " + sets[3]);
 
     // convenience vars to test various combinations;
     var s1beats2 = firstSetIsBetter(sets[1], sets[2]),
