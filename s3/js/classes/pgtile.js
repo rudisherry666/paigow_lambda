@@ -180,21 +180,21 @@ PGTile.prototype.TILE_INDEX = {
 PGTile.prototype.TILE_NAME = {
     TEEN:         'teen',
     DAY:          'day',
-    HIGH_EIGHT:   'high eight',
-    HARMONY_FOUR: 'harmony four',
-    HIGH_TEN:     'high ten',
-    LONG_SIX:     'long six',
-    LOW_FOUR:     'low four',
+    HIGH_EIGHT:   'high-eight',
+    HARMONY_FOUR: 'harmony-four',
+    HIGH_TEN:     'high-ten',
+    LONG_SIX:     'long-six',
+    LOW_FOUR:     'low-four',
     ELEVEN:       'eleven',
     TEN:          'ten',
     SEVEN:        'seven',
     SIX:          'six',
-    MIXED_NINE:   'mixed nine',
-    MIXED_EIGHT:  'mixed eight',
-    MIXED_SEVEN:  'mixed seven',
-    MIXED_FIVE:   'mixed five',
-    GEE_JOON:     'gee joon',
-    HIDDEN:       '???'
+    MIXED_NINE:   'mixed-nine',
+    MIXED_EIGHT:  'mixed-eight',
+    MIXED_SEVEN:  'mixed-seven',
+    MIXED_FIVE:   'mixed-five',
+    GEE_JOON:     'gee-joon',
+    HIDDEN:       'hidden'
 };
 
 
