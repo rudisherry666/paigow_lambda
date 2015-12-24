@@ -6,6 +6,7 @@
 */
 
 define([
+    'utils/pgsessionutils',
     'models/pgplayermodel',
     'views/pgplayernameview',
     'views/pgsigninview',
@@ -16,6 +17,7 @@ define([
     'views/pggametableview',
     'views/pggameview'
 ], function(
+    sessionUtils,
     PGPlayerModel,
     PGPlayerNameView,
     PGSigninView,
@@ -203,7 +205,7 @@ define([
                     console.log(err);
                 }
             };
-            this._options.pgSessionModel.addSessionHashHeader(ajaxOptions);
+            sessionUtils.addSessionHashHeader(ajaxOptions);
             $.ajax(ajaxOptions);
         }
     });

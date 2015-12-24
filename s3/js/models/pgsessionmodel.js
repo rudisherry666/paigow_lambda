@@ -8,8 +8,10 @@
 */
 
 define([
+    'utils/pgsessionutils',
     'models/pgbasemodel'
 ], function(
+    sessionUtils,
     PGBaseModel
 ) {
 
@@ -23,7 +25,7 @@ define([
             // Get the sessionHash cookie if we have it, and if we do,
             // restore the session itself.  Fetch will trigger 'sync'
             // or 'error'.
-            this.initializeSessionHash();
+            sessionUtils.initializeSessionHash();
 
             this.listenTo(this, 'sync', function(data) {
                 this.get('eventBus').trigger('login');
@@ -45,7 +47,7 @@ define([
         urlPath: '/session',
 
         startSession: function() {
-            if (this.getSessionHash()) {
+            if (sessionUtils.getSessionHash()) {
                 this.fetch();
             } else {
                 this.get('eventBus').trigger('logout');
@@ -66,7 +68,7 @@ define([
                     data: JSON.stringify(data),
                     success: _.bind(function(data) {
                         console.log('Successful login');
-                        this.setSessionHash(data.sessionHash);
+                        sessionUtils.setSessionHash(data.sessionHash);
                         this.set('sessionHash', data.sessionHash);
                         this.fetch();
                         defer.resolve();
@@ -78,7 +80,7 @@ define([
                     }, this)
                 };
 
-            this.addSessionHashHeader(ajaxOptions);
+            sessionUtils.addSessionHashHeader(ajaxOptions);
             $.ajax(ajaxOptions);
 
             return defer.promise();
@@ -92,7 +94,7 @@ define([
                     contentType: 'application/json;charset=UTF-8',
                     success: _.bind(function(data) {
                         console.log('Successful register');
-                        this.setSessionHash(data.sessionHash);
+                        sessionUtils.setSessionHash(data.sessionHash);
                         this.set('sessionHash', data.sessionHash);
                         this.fetch();
                         defer.resolve();
@@ -111,7 +113,7 @@ define([
                 });
             ajaxOptions.data = JSON.stringify(data);
 
-            this.addSessionHashHeader(ajaxOptions);
+            sessionUtils.addSessionHashHeader(ajaxOptions);
             $.ajax(ajaxOptions);
 
             return defer.promise();

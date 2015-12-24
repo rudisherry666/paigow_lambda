@@ -7,7 +7,11 @@
 
 // From http://stackoverflow.com/questions/15191058/css-rotation-cross-browser-with-jquery-animate
 
-define([], function() {
+define([
+    'utils/config'
+], function(
+    config
+) {
     return {
         animateRotate: function($element, angleBegin, angleEnd) {
             // we use a pseudo object for the animation
@@ -23,6 +27,12 @@ define([], function() {
                     });
                 }
             });
+        },
+
+        getCookie: function(name) {
+            var value = config.mock ? config.mockCookie : ("; " + document.cookie);
+            var parts = value.split("; " + name + "=");
+            if (parts.length == 2) return parts.pop().split(";").shift();
         }
     };
 });
