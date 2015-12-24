@@ -33,7 +33,10 @@ define([
             var value = config.mock ? config.mockCookie : ("; " + document.cookie);
             var parts = value.split("; " + name + "=");
             if (parts.length == 2) return parts.pop().split(";").shift();
-        }
+        },
+
+        urlRoot: 'https://4lsjp8j9ji.execute-api.us-west-2.amazonaws.com/test',
+
     };
 });
 

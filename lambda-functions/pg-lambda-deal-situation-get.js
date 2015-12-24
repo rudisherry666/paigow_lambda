@@ -37,7 +37,7 @@ exports.handler = function(event, context) {
         return dbUtils.getItem(dynamodb, 'deal', 'dealID', dealID);
     })
     .then(function(dbDeal) {
-        context.succeed({ situation: dbDeal.situation });
+        context.succeed(dbDeal.situation);
     })
     .fail(function(err) {
         console.log('fail, no deal or could not get it');

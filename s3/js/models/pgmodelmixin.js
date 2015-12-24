@@ -24,7 +24,7 @@ define([
             _.extend(obj, {
 
                 // Subclasses just use urlPath, we set the root.
-                urlRoot: 'https://4lsjp8j9ji.execute-api.us-west-2.amazonaws.com/test',
+                urlRoot: browserUtils.urlRoot,
                 url: function() {
                     return this.urlRoot + _.result(this, 'urlPath');
                 },

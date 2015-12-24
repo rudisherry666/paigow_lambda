@@ -6,11 +6,15 @@
 */
 
 define([
+    'utils/pgbrowserutils',
+    'utils/pgsessionutils',
     'views/pgbaseview',
     'models/ui/pgdealuimodel',
     'views/pghandview',
     'templates/pggameview'
 ], function(
+    browserUtils,
+    sessionUtils,
     PGBaseView,
     PGDealUIModel,
     PGHandView,
@@ -21,6 +25,11 @@ define([
 
         // -------------------------------------------------------
         // Superclass overrides
+
+        initialize: function(options) {
+            _.bindAll(this, '_pollForOpponentState');
+            return this._super(options);
+        },
 
         events: {
             'click .pgswitchhands-btn'        : "_switchHands",
@@ -165,18 +174,16 @@ define([
                     // We know the opponent is ready because the deal's
                     // opponent's situation will be 'TILES_ARE_SET'.
                     var oSituation = model.get('situation').opponent;
+                    oSituation = 'TILES_NOT_SET';
                     switch (oSituation) {
                         case 'TILES_ARE_SET':
                             o.eventBus.trigger('deal:opponent_tiles_are_set');
                         break;
 
+                        case 'DEAL_NOT_SEEN':
                         case 'TILES_NOT_SET':
                             // The opponent is still thinking: we have to poll.
-                        break;
-
-                        case 'DEAL_NOT_SEEN':
-                            // The opponent has not yet seen their tiles:
-                            // we have to poll.
+                            _.delay(this._pollForOpponentState, 2000);
                         break;
                     }
                 }, this),
@@ -206,6 +213,28 @@ define([
             o.pgDealUIModel.set('situation', newSituation);
         },
 
+        _pollForOpponentState: function() {
+            var o = this._options,
+                ajaxOptions = sessionUtils.addSessionHashHeader({
+                    url: browserUtils.urlRoot + o.pgDealModel.urlBasePath() + '/situation',
+                    success: _.bind(function(pgDealSituation) {
+                        // Checking if all is done.
+                        if (pgDealSituation.opponent === 'TILES_ARE_SET') {
+                            o.eventBus.trigger('deal:opponent_tiles_are_set');
+                        }
+                    }, this),
+                    error: _.bind(function(error) {
+                        console.log('Cannot get situation!');
+                    }, this),
+                    complete: _.bind(function() {
+                        if (o.pgDealModel.get('situation').opponent !== 'TILES_ARE_SET') {
+                            _.delay(this._pollForOpponentState, 2000);
+                        }
+                    })
+                });
+            $.ajax(ajaxOptions);
+        },
+
         _opponentTilesAreSet: function() {
             var o = this._options,
                 d = o.pgDealModel,
@@ -220,6 +249,8 @@ define([
                 _.each(o.pgHandViews, function(pgHandView, index) {
                     pgHandView.setTileIndexes(tiles.slice(12+(index*4), 12+((index+1)*4)));
                 });
+
+                this._setDealSituation('scoring');
             }
         },
 

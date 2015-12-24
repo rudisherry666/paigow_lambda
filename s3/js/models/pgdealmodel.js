@@ -29,8 +29,13 @@ function(
         },
 
         idAttribute: 'dealID',
+
+        urlBasePath: function() {
+            return '/game/' + this.gameHash() + '/deal/' + this.dealIndex();
+        },
+
         urlPath: function() {
-            return '/game/' + this.gameHash() + '/deal/' + this.dealIndex() + '/player';
+            return this.urlBasePath() + '/player';
         },
 
         toJSON: function() {
