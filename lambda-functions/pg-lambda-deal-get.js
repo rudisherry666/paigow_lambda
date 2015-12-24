@@ -53,19 +53,13 @@ exports.handler = function(event, context) {
         console.log('got deal:');
         console.log(deal);
 
-        retDeal = {
-            tiles: deal.tiles,
-            situation: deal.situation,
-            points: deal.points
-        };
-
         // Cloak the opponent's tiles if both players haven't set yet.
         if (deal.situation.player !== 'TILES_ARE_SET' ||
                 deal.situation.opponent !== 'TILES_ARE_SET') {
             console.log('cloaking opponent tiles');
-            for (i = 12; i < 24; i++) retDeal.tiles[i] = 32;
+            for (i = 12; i < 24; i++) deal.tiles[i] = 32;
         }
-        context.succeed(retDeal);
+        context.succeed(deal);
     })
     .fail(function(err) {
         console.log('fail, no deal or could not get it');
