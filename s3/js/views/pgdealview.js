@@ -291,7 +291,8 @@ define([
         },
 
         _allTilesAreSet: function() {
-            var o = this._options;
+            var o = this._options,
+                tiles;
 
             // The opponent's tile now become visible
             if (!o.isPlayer) {
