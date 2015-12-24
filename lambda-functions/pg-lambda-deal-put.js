@@ -2,6 +2,7 @@ var q = require('q'),
     utils = require('general-utils'),
     dbUtils = require('db-utils'),
     pg = require('pg'),
+    PGSet = require('pg-classes/pgset'),
     dynamodb, session;
 
 exports.handler = function(event, context) {
@@ -40,7 +41,7 @@ exports.handler = function(event, context) {
                 error: 'No situation supplied for putting deal',
                 code: 'PG_ERROR_MISSING_SITUATION_PARAMETER'
             });
-        } else if (["tiles_are_set", "ready_for_next_deal"].indexOf(event.situation) < 0) {
+        } else if (["tiles_are_set", "deal-done"].indexOf(event.situation) < 0) {
             defer.reject({
                 error: 'Bad situation supplied for putting deal',
                 code: 'PG_ERROR_BAD_SITUATION_PARAMETER'
@@ -124,6 +125,39 @@ exports.handler = function(event, context) {
         return defer.promise;
     }
 
+    function scoreDeal(deal) {
+        console.log('looking to score deal');
+        if (deal.situation.player === 'TILES_ARE_SET' &&
+                deal.situation.opponent === 'TILES_ARE_SET') {
+            var ih;
+            console.log('both players have set their tiles, scoring deal');
+            deal.points = [];
+            for (ih = 0; ih < 3; ih++) {
+                var pStart = ih * 4,
+                    oStart = pStart + 12,
+                    pSet = new PGSet(deal.tiles.slice(pStart, pStart + 4)),
+                    oSet = new PGSet(deal.tiles.slice(oStart, oStart + 4));
+                    comp = pSet.compare(oSet);
+                console.log('scoring for ' + (ih + 1) + ' points:');
+                console.log('   player: ' + pSet.toString());
+                console.log(' opponent: ' + oSet.toString());
+                if (comp > 0) {
+                    deal.points.push(3-ih);
+                    console.log('    ...player wins');
+                } else if (comp < 0) {
+                    deal.points.push(-(3-ih));
+                    console.log('    ...opponent wins');
+                } else {
+                    deal.points.push(0);
+                    console.log('    ...push');
+                }
+            }
+        } else {
+            console.log('one or both players are not ready to score.');
+        }
+        return deal;
+    }
+
     function setTiles(dbDeal) {
         return checkTiles(dbDeal.tiles, event.tiles)
         .then(function() {
@@ -140,7 +174,7 @@ exports.handler = function(event, context) {
             dbDeal.situation.player = 'TILES_ARE_SET';
             console.log('spliced tiles in');
             console.log(dbDeal);
-            deal = dbDeal;
+            deal = scoreDeal(dbDeal);
             return dbUtils.putItem(dynamodb, 'deal', deal);
         });
     }
@@ -199,7 +233,7 @@ exports.handler = function(event, context) {
         // Depending on the payload, we update the deal.
         if (event.situation === 'tiles_are_set') {
             return setTiles(dbDeal);
-        } else if (event.situation === 'ready_for_next_deal') {
+        } else if (event.situation === 'deal-done') {
             return addAnotherDeal(dbDeal);
         }
     })
