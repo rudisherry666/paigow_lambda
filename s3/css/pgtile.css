@@ -38,7 +38,7 @@
     display: none;
 }
 
-.pg-hidden-hands .pgdot {
+.pg-deal-hidden-hands .pgdot {
     display: none !important;
 }
 
@@ -48,6 +48,7 @@
 
 .pg-deal-opponent.pg-hands-set .pg-low-hand > div {
     transform: rotate(90deg);
+    transition: transform 1s;
 }
 
 /* ----------- TEEN ----------- */

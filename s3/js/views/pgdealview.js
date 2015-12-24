@@ -27,17 +27,17 @@ define([
         // Superclass overrides
 
         initialize: function(options) {
-            _.bindAll(this, '_pollForOpponentState');
+            _.bindAll(this, '_pollForSituation');
             return this._super(options);
         },
 
         events: {
-            'click .pgswitchhands-btn'        : "_switchHands",
-            'click .pg-deal-preview-hands'    : "_previewHands",
-            'click .pg-deal-un-preview-hands' : "_unPreviewHands",
-            'click .pg-deal-tiles-are-set'    : "_tilesAreSet",
-            'click .pg-deal-next-deal'        : "_nextDeal",
-            'click .pg-deal-another-game'     : "_anotherGame"
+            'click .pgswitchhands-btn'        : '_switchHands',
+            'click .pg-deal-preview-hands'    : '_previewHands',
+            'click .pg-deal-un-preview-hands' : '_unPreviewHands',
+            'click .pg-deal-tiles-are-set'    : '_tilesAreSet',
+            'click .pg-deal-next-deal'        : '_nextDeal',
+            'click .pg-deal-another-game'     : '_anotherGame'
         },
 
         _addModels: function() {
@@ -72,11 +72,11 @@ define([
                 pgHandView.render();
             });
 
-            // We start with 'thinking'.
+            // When the deal is gotten we'll set things up correctly.
             if (o.isPlayer) {
-                this._setClass('pg-deal-thinking');
+                this._setClass('pg-deal-waiting pg-deal-hidden-hands');
             } else {
-                this._setClass('pg-deal-opponent pg-hidden-hands');
+                this._setClass('pg-deal-opponent pg-deal-hidden-hands');
             }
 
             return this._super();
@@ -90,11 +90,16 @@ define([
                 // If the situation changes as a result of clicking one of the buttons,
                 // update the state of the buttons.
                 this.listenTo(o.pgDealUIModel, 'change:situation', this._onDealSituationChange);
-                this.listenTo(o.eventBus, 'deal:tiles_are_set', this._onTilesSet);
-            } else {
                 this.listenTo(o.pgDealModel, 'sync', this._onDealSync);
+                this.listenTo(o.eventBus, 'deal:tiles_are_set', this._onTilesSet);
+
+                // Start polling for the opponent's state.
+                _.delay(this._pollForSituation, 2000);
+            } else {
                 this.listenTo(o.eventBus, 'deal:opponent_tiles_are_set', this._opponentTilesAreSet);
             }
+
+            this.listenTo(o.eventBus, 'deal:all_tiles_are_set', this._allTilesAreSet);
 
             return this._super();
         },
@@ -121,11 +126,11 @@ define([
         },
 
         _nextDeal: function(e) {
-            this._setDealSituation('ready_for_next_deal');
+            this._setDealSituation('deal-done');
         },
 
         _anotherGame: function(e) {
-            this._setDealSituation('ready_for_next_game');
+            this._setDealSituation('game-done');
         },
 
         _onDealSituationChange: function(model, newSituation) {
@@ -133,27 +138,34 @@ define([
             switch (newSituation) {
                 case 'tiles_are_set':
                     this._setClass('pg-deal-tiles-are-set');
+                    this.$el.addClass('pg-no-manipulate')
+                            .removeClass('pg-deal-hidden-hands');
                     o.eventBus.trigger('deal:tiles_are_set');
                 break;
-                case "thinking":
+
+                case 'thinking':
                     this._setClass('pg-deal-thinking');
-                    this.$el.removeClass('pg-no-manipulate pg-hidden-hands');
+                    this.$el.removeClass('pg-no-manipulate pg-deal-hidden-hands');
                 break;
-                case "previewing":
+
+                case 'previewing':
                     this._setClass('pg-deal-previewing');
-                    this.$el.addClass('pg-no-manipulate');
+                    this.$el.addClass('pg-no-manipulate')
+                            .removeClass('pg-deal-hidden-hands');
                 break;
 
-                case "ready_for_next_deal":
-                    this._setClass('pg-deal-ready_for_next_deal');
-                    this.$el.addClass('pg-no-manipulate pg-hidden-hands');
-                    o.eventBus.trigger('deal:ready_for_next_deal');
+                case 'deal-done':
+                    this._setClass('pg-deal-deal-done');
+                    this.$el.addClass('pg-no-manipulate')
+                            .removeClass('pg-deal-hidden-hands');
+                    o.eventBus.trigger('deal:deal-done');
                 break;
 
-                case "ready_for_next_game":
-                    this._setClass('pg-deal-ready_for_next_game');
-                    this.$el.addClass('pg-no-manipulate pg-hidden-hands');
-                    o.eventBus.trigger('deal:ready_for_next_game');
+                case 'game-done':
+                    this._setClass('pg-deal-game-done');
+                    this.$el.addClass('pg-no-manipulate')
+                            .removeClass('pg-deal-hidden-hands');
+                    o.eventBus.trigger('deal:game-done');
                 break;
             }
         },
@@ -182,8 +194,7 @@ define([
 
                         case 'DEAL_NOT_SEEN':
                         case 'TILES_NOT_SET':
-                            // The opponent is still thinking: we have to poll.
-                            _.delay(this._pollForOpponentState, 2000);
+                            // The opponent is still thinking.
                         break;
                     }
                 }, this),
@@ -193,18 +204,11 @@ define([
             });
         },
 
-        _onDealSync: function(model, deal) {
-            var o = this._options;
-            if (deal.situation.opponent === 'TILES_ARE_SET') {
-                o.eventBus.trigger('deal:opponent_tiles_are_set');
-            }
-        },
-
         // -------------------------------------------------------
         // Convenience methods
 
         _setClass: function(newClass) {
-            this.$el.removeClass('pg-deal-thinking pg-deal-previewing pg-deal-deal-done pg-deal-game-done')
+            this.$el.removeClass('pg-deal-waiting pg-deal-thinking pg-deal-previewing pg-deal-deal-done pg-deal-game-done')
                     .addClass(newClass);
         },
 
@@ -213,24 +217,61 @@ define([
             o.pgDealUIModel.set('situation', newSituation);
         },
 
-        _pollForOpponentState: function() {
+        _areAllTilesSet: function(situation) {
+            return (situation.opponent === 'TILES_ARE_SET' &&
+                    situation.player === 'TILES_ARE_SET');
+        },
+
+        _onDealSync: function(model) {
+            var o = this._options,
+                d = o.pgDealModel,
+                s = d.get('situation');
+
+            // Depending on what the situation is, show different states
+            // in our hand.
+            switch(s.player) {
+                case 'TILES_ARE_SET':
+                    if (s.opponent === 'TILES_ARE_SET') {
+                        this._setDealSituation('deal-done');
+                    } else {
+                        this._setDealSituation('tiles_are_set');
+                    }
+                break;
+
+                case 'TILES_NOT_SET':
+                    this._setDealSituation('thinking');
+                break;
+
+            }
+            if (this._areAllTilesSet(s)) {
+                o.eventBus.trigger('deal:opponent_tiles_are_set');
+            }
+        },
+
+        _pollForSituation: function() {
             var o = this._options,
                 ajaxOptions = sessionUtils.addSessionHashHeader({
                     url: browserUtils.urlRoot + o.pgDealModel.urlBasePath() + '/situation',
                     success: _.bind(function(pgDealSituation) {
-                        // Checking if all is done.
-                        if (pgDealSituation.opponent === 'TILES_ARE_SET') {
-                            o.eventBus.trigger('deal:opponent_tiles_are_set');
+                        if (this._areAllTilesSet(pgDealSituation)) {
+                            // We had already set our tiles, and finally the
+                            // opponent has set them: fetch the deal again to
+                            // get the opponent's tile values.  It will trigger
+                            // 'sync' and we'll show and score that that time.
+                            o.pgDealModel.fetch();
+                        } else if (pgDealSituation.opponent === 'TILES_ARE_SET') {
+                            this._opponentTilesAreSet();
                         }
                     }, this),
                     error: _.bind(function(error) {
-                        console.log('Cannot get situation!');
+                        console.log('Cannot get situation... will keep polling!');
                     }, this),
                     complete: _.bind(function() {
-                        if (o.pgDealModel.get('situation').opponent !== 'TILES_ARE_SET') {
-                            _.delay(this._pollForOpponentState, 2000);
+                        // Only stop if all tiles are set.
+                        if (!this._areAllTilesSet(o.pgDealModel.get('situation'))) {
+                            _.delay(this._pollForSituation, 2000);
                         }
-                    })
+                    }, this)
                 });
             $.ajax(ajaxOptions);
         },
@@ -238,20 +279,32 @@ define([
         _opponentTilesAreSet: function() {
             var o = this._options,
                 d = o.pgDealModel,
-                tiles = d.get('tiles');
+                tiles;
+
+            // Make sure we know they've set.
+            this.$el.addClass('pg-hands-set');
 
             // If our tiles are set as well, then everything goes.
             if (d.get('situation').player === 'TILES_ARE_SET') {
-                // Make sure we can show the tiles.
-                this.$el.removeClass('pg-hidden-hands');
+                o.eventBus.trigger('deal:all_tiles_are_set');
+            }
+        },
+
+        _allTilesAreSet: function() {
+            var o = this._options;
+
+            // The opponent's tile now become visible
+            if (!o.isPlayer) {
+                this.$el.removeClass('pg-deal-hidden-hands');
 
                 // Reset the tile indexes for the hands.
+                tiles = o.pgDealModel.get('tiles');
                 _.each(o.pgHandViews, function(pgHandView, index) {
                     pgHandView.setTileIndexes(tiles.slice(12+(index*4), 12+((index+1)*4)));
                 });
-
-                this._setDealSituation('scoring');
             }
+
+            this._setDealSituation('deal-done');
         },
 
         _switchHandsEx: function(whichHand) {

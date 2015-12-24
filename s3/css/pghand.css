@@ -36,7 +36,7 @@
     pointer-events: none;
 }
 
-.pg-hidden-hands .pghand .pg2tile-label {
+.pg-deal-hidden-hands .pghand .pg2tile-label {
     visibility: hidden;
 }
 
@@ -50,7 +50,7 @@
     cursor: pointer;
 }
 
-.pg-hidden-hands .pghand .rotatetiles-btn {
+.pg-deal-hidden-hands .pghand .rotatetiles-btn {
     display: none;
 }
 
