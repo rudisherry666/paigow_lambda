@@ -2,7 +2,7 @@
     position: relative;
     display: inline-block;
     padding-top: 10px;
-    background-color: LimeGreen;
+    background-color: DeepSkyBlue;
     border-radius: 5px;
     text-align: center;
     margin-left: 10px;
@@ -68,7 +68,7 @@
 }
 
 .pg-handpoints.pg-loser {
-    color: LimeGreen;
+    color: DeepSkyBlue;
 }
 
 .pg-deal-opponent {
