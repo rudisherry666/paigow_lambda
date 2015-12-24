@@ -292,7 +292,7 @@ define([
 
         _allTilesAreSet: function() {
             var o = this._options,
-                tiles;
+                tiles, ip, points;
 
             // The opponent's tile now become visible
             if (!o.isPlayer) {
@@ -303,6 +303,19 @@ define([
                 _.each(o.pgHandViews, function(pgHandView, index) {
                     pgHandView.setTileIndexes(tiles.slice(12+(index*4), 12+((index+1)*4)));
                 });
+            }
+
+            // Do the scoring.
+            points = o.pgDealModel.get('points');
+            if (points) {
+                for (ip = 0; ip < 3; ip++) {
+                    var point = points[ip];
+                    if (point) {
+                        if (!o.isPlayer) point = -point;
+                        handPoint = this.$('.pg-handpoints-' + (3 - ip));
+                        handPoint.addClass(point > 0 ? 'pg-winner' : 'pg-loser');
+                    }
+                }
             }
 
             this._setDealSituation('deal-done');
