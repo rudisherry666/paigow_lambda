@@ -136,6 +136,7 @@ PGSet.prototype.sumAndDiff = function() {
     };
     if (hand1Value <= 9 && hand2Value <= 9)
         sad.valDiff = hand1Value - hand2Value;
+    sad.pgSet = this;
     return sad;
 };
 
@@ -162,15 +163,37 @@ PGSet.prototype.toString = function() {
 *
 */
 PGSet.prototype.compare = function(set) {
-    if (!set) throw "PGSet.compare given set hand to compare";
-    var myRanks = this.ranks();
-    var hisRanks = set.ranks();
-    if (myRanks[0] > hisRanks[0] && myRanks[1] > hisRanks[1])
+    var comps = this.compareEx(set);
+    if (comps === 'WW')
         return 1;
-    else if (myRanks[0] < hisRanks[0] && myRanks[1] < hisRanks[1])
+    else if (comps === 'LL')
         return -1;
     else
         return 0;
+};
+
+function compareRank(rank1, rank2) {
+    if (rank1 > rank2) return 'W';
+    if (rank1 < rank2) return 'L';
+    return 'P';
+}
+
+/*
+* @method compareEx
+*
+* Returns the detailed comparison: (W|L|P)(W|L|P) for high/low hands
+*
+*
+* @param hand the other hand to compare against
+*
+*/
+PGSet.prototype.compareEx = function(set) {
+    if (!set) throw "PGSet.compareEx given no set hand to compare";
+    var myRanks = this.ranks(),
+        hisRanks = set.ranks(),
+        comp0 = compareRank(myRanks[0], hisRanks[0]),
+        comp1 = compareRank(myRanks[1], hisRanks[1]);
+    return comp0 + comp1;
 };
 
 // Sneaky way to make this either a require module or a Node module
