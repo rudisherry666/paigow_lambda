@@ -132,6 +132,7 @@ exports.handler = function(event, context) {
             var ih;
             console.log('both players have set their tiles, scoring deal');
             deal.points = [];
+            deal.handpoints = [];
             for (ih = 0; ih < 3; ih++) {
                 var pStart = ih * 4,
                     oStart = pStart + 12,
@@ -151,6 +152,9 @@ exports.handler = function(event, context) {
                     deal.points.push(0);
                     console.log('    ...push');
                 }
+
+                // Push the detail W/L/P for each hand.
+                deal.handpoints.push(pSet.compareEx(oSet));
             }
         } else {
             console.log('one or both players are not ready to score.');
