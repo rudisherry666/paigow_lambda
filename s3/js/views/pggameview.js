@@ -51,19 +51,29 @@ define([
                 $game = this.$el,
                 compiled = _.template(template.game),
                 oDeal = _.pick(o, 'eventBus', 'pgSessionModel',
-                                  'pgGameModel', 'pgDealModel');
+                                  'pgGameModel', 'pgDealModel'),
+                playerName = o.pgSessionModel.get('username'),
+                g = o.pgGameModel,
+                opponent = g.opponent(),
+                amPlayer = g.get('players').indexOf(playerName) === 0,
+                score = g.get('score');
 
-            this.$el.append(compiled());
+            this.$el.append(compiled({
+                playerName: playerName,
+                opponentName: opponent,
+                playerScore: amPlayer ? score[0] : score[1],
+                opponentScore: amPlayer ? score[1] : score[0]
+            }));
 
             this._dealViews = [
                 new PGDealView(_.extend({
                     el: this.$('.pg-deal-player'),
-                    username: o.pgSessionModel.get('username'),
+                    username: playerName,
                     isPlayer: true,
                 }, oDeal)),
                 new PGDealView(_.extend({
                     el: this.$('.pg-deal-opponent'),
-                    username: o.pgGameModel.opponent(),
+                    username: opponent,
                     isPlayer: false,
                 }, oDeal)),
             ];
