@@ -45,6 +45,7 @@ define([
             this.listenTo(o.pgGameUIModel, 'change:situation', this._onGameSituationChange);
 
             this.listenTo(o.eventBus, 'deal:tiles_are_set', this._tilesAreSet);
+            this.listenTo(o.eventBus, 'deal:opponent_tiles_are_set', this._opponentTilesAreSet);
 
             return this._super();
         },
@@ -130,21 +131,9 @@ define([
             }
         },
 
-        _handleDealState: function() {
+        _opponentTilesAreSet: function() {
             var o = this._options;
-
-            switch (o.pgDealModel.get('situation')) {
-
-                case 'thinking':
-                case 'previewing':
-                    // Make sure the computer hand is hidden
-                    $(".pg-deal-opponent").addClass("pg-hidden-hands");
-
-                    // All point-nums back to normal.
-                    this.$el.find('.pg-handpoints, .pghand').removeClass("pg-winner pg-loser pg-push");
-                break;
-
-            }
+            $('.pg-deal-opponent').addClass('pg-hands-set');
         },
 
         // The player has set their tiles

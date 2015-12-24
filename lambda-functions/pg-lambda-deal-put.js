@@ -137,7 +137,7 @@ exports.handler = function(event, context) {
             // TODO: if the opponent is the computer, set the tiles; if the
             // opponent is another player, we need to see if they're set.
             // For now, assume it's computer and the tiles are set.
-            dbDeal.situation = "FINISHED";
+            dbDeal.situation.player = 'TILES_ARE_SET';
             console.log('spliced tiles in');
             console.log(dbDeal);
             deal = dbDeal;

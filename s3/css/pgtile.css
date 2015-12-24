@@ -46,7 +46,7 @@
     opacity: 0.5;
 }
 
-.pg-deal-opponent:not(.pg-hidden-hands) .pg-low-hand > div {
+.pg-deal-opponent.pg-hands-set .pg-low-hand > div {
     transform: rotate(90deg);
 }
 

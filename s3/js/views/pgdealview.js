@@ -80,12 +80,11 @@ define([
             if (o.isPlayer) {
                 // If the situation changes as a result of clicking one of the buttons,
                 // update the state of the buttons.
-                this.listenTo(o.pgDealUIModel, 'change:situation',
-                    this._onDealSituationChange);
-
+                this.listenTo(o.pgDealUIModel, 'change:situation', this._onDealSituationChange);
                 this.listenTo(o.eventBus, 'deal:tiles_are_set', this._onTilesSet);
             } else {
                 this.listenTo(o.pgDealModel, 'sync', this._onDealSync);
+                this.listenTo(o.eventBus, 'deal:opponent_tiles_are_set', this._opponentTilesAreSet);
             }
 
             return this._super();
@@ -163,13 +162,22 @@ define([
                 success: _.bind(function(model, response, options) {
                     // The tiles hav been updated, during 'save', with the
                     // actual opponent's tiles -- if the opponent is ready.
-                    // We know the opponent is ready because the deal situate
-                    // will be 'FINISHED'.
-                    if (model.get('situation') === 'FINISHED') {
+                    // We know the opponent is ready because the deal's
+                    // opponent's situation will be 'TILES_ARE_SET'.
+                    var oSituation = model.get('situation').opponent;
+                    switch (oSituation) {
+                        case 'TILES_ARE_SET':
+                            o.eventBus.trigger('deal:opponent_tiles_are_set');
+                        break;
 
-                    } else {
-                        // TODO: if the opponent is not ready we need to poll
-                        // until (s)he is.
+                        case 'TILES_NOT_SET':
+                            // The opponent is still thinking: we have to poll.
+                        break;
+
+                        case 'DEAL_NOT_SEEN':
+                            // The opponent has not yet seen their tiles:
+                            // we have to poll.
+                        break;
                     }
                 }, this),
                 error: _.bind(function(model, response, options) {
@@ -180,15 +188,8 @@ define([
 
         _onDealSync: function(model, deal) {
             var o = this._options;
-
-            if (deal.situation === 'FINISHED') {
-                // Make sure we can shown the tiles.
-                this.$el.removeClass('pg-hidden-hands');
-
-                // Reset the tile indexes for the hands.
-                _.each(o.pgHandViews, function(pgHandView, index) {
-                    pgHandView.setTileIndexes(deal.tiles.slice(12+(index*4), 12+((index+1)*4)));
-                });
+            if (deal.situation.opponent === 'TILES_ARE_SET') {
+                o.eventBus.trigger('deal:opponent_tiles_are_set');
             }
         },
 
@@ -203,6 +204,23 @@ define([
         _setDealSituation: function(newSituation) {
             var o = this._options;
             o.pgDealUIModel.set('situation', newSituation);
+        },
+
+        _opponentTilesAreSet: function() {
+            var o = this._options,
+                d = o.pgDealModel,
+                tiles = d.get('tiles');
+
+            // If our tiles are set as well, then everything goes.
+            if (d.get('situation').player === 'TILES_ARE_SET') {
+                // Make sure we can show the tiles.
+                this.$el.removeClass('pg-hidden-hands');
+
+                // Reset the tile indexes for the hands.
+                _.each(o.pgHandViews, function(pgHandView, index) {
+                    pgHandView.setTileIndexes(tiles.slice(12+(index*4), 12+((index+1)*4)));
+                });
+            }
         },
 
         _switchHandsEx: function(whichHand) {
