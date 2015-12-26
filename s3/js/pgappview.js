@@ -189,11 +189,21 @@ define([
 
                     // Start the game once the add has finished.
                     this._options.pgGamesCollection.once('add', _.bind(function(pgGameModel) {
-                        this._resumeGame({
-                            pgGameModel: pgGameModel,
-                            pgSessionModel: o.pgSessionModel,
-                            pgPlayerModel: o.pgPlayerModel
-                        });
+                        if (pgGameModel.players) {
+                            this._resumeGame({
+                                pgGameModel: pgGameModel,
+                                pgSessionModel: o.pgSessionModel,
+                                pgPlayerModel: o.pgPlayerModel
+                            });
+                        } else {
+                            pgGameModel.once('sync', _.bind(function(pgGameModel) {
+                                this._resumeGame({
+                                    pgGameModel: pgGameModel,
+                                    pgSessionModel: o.pgSessionModel,
+                                    pgPlayerModel: o.pgPlayerModel
+                                });
+                            }, this));
+                        }
                     }, this));
                     // We created a new game; the response is the same
                     // as getting all the games, so just add it as is
