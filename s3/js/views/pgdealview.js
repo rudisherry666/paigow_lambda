@@ -314,7 +314,7 @@ define([
 
         _allTilesAreSet: function() {
             var o = this._options,
-                tiles, ip, points, handpoints, handpoint, $pg2Tiles, $handPoint, winLoseClass;
+                tiles, ip, points, handpoints, $pg2Tiles, $handPoint, winLoseClass;
 
             // The opponent's tile now become visible
             if (!o.isPlayer) {
