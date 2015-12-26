@@ -125,43 +125,6 @@ exports.handler = function(event, context) {
         return defer.promise;
     }
 
-    function scoreDeal(deal) {
-        console.log('looking to score deal');
-        if (deal.situation.player === 'TILES_ARE_SET' &&
-                deal.situation.opponent === 'TILES_ARE_SET') {
-            var ih;
-            console.log('both players have set their tiles, scoring deal');
-            deal.points = [];
-            deal.handpoints = [];
-            for (ih = 0; ih < 3; ih++) {
-                var pStart = ih * 4,
-                    oStart = pStart + 12,
-                    pSet = new PGSet(deal.tiles.slice(pStart, pStart + 4)),
-                    oSet = new PGSet(deal.tiles.slice(oStart, oStart + 4));
-                    comp = pSet.compare(oSet);
-                console.log('scoring for ' + (ih + 1) + ' points:');
-                console.log('   player: ' + pSet.toString());
-                console.log(' opponent: ' + oSet.toString());
-                if (comp > 0) {
-                    deal.points.push(3-ih);
-                    console.log('    ...player wins');
-                } else if (comp < 0) {
-                    deal.points.push(-(3-ih));
-                    console.log('    ...opponent wins');
-                } else {
-                    deal.points.push(0);
-                    console.log('    ...push');
-                }
-
-                // Push the detail W/L/P for each hand.
-                deal.handpoints.push(pSet.compareEx(oSet));
-            }
-        } else {
-            console.log('one or both players are not ready to score.');
-        }
-        return deal;
-    }
-
     function setTiles(dbDeal) {
         return checkTiles(dbDeal.tiles, event.tiles)
         .then(function() {
@@ -178,7 +141,7 @@ exports.handler = function(event, context) {
             dbDeal.situation.player = 'TILES_ARE_SET';
             console.log('spliced tiles in');
             console.log(dbDeal);
-            deal = scoreDeal(dbDeal);
+            deal = addPointsToDeal(dbDeal);
             return dbUtils.putItem(dynamodb, 'deal', deal);
         });
     }
