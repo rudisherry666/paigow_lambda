@@ -86,12 +86,19 @@ define([
             return defer.promise();
         },
 
-        register: function(username, password, email) {
+        register: function(playerModel) {
             var defer = $.Deferred(),
+                data = _.extend(
+                    _.pick(playerModel.attributes, 'username', 'password'), {
+                    action: 'register',
+                    email: 'rudisherry666@gmail.com'
+                }),
                 ajaxOptions = {
-                    url: this.urlRoot + '/login',
+                    url: this.urlRoot + '/register',
                     method: 'POST',
                     contentType: 'application/json;charset=UTF-8',
+                    dataType: 'json',
+                    data: JSON.stringify(data),
                     success: _.bind(function(data) {
                         console.log('Successful register');
                         sessionUtils.setSessionHash(data.sessionHash);
@@ -105,13 +112,6 @@ define([
                         // this.get('eventBus').trigger('logout');
                     }, this)
                 };
-
-            ajaxOptions.data = _.extend(
-                    _.pick(playerModel.attributes, 'username', 'password'), {
-                    action: 'register',
-                    email: 'rudisherry666@gmail.com'
-                });
-            ajaxOptions.data = JSON.stringify(data);
 
             sessionUtils.addSessionHashHeader(ajaxOptions);
             $.ajax(ajaxOptions);

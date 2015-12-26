@@ -172,7 +172,10 @@ exports.handler = function(event, context) {
 
     function loginSuccess(player) {
         console.log('loginSuccess!');
-        response = { info: 'Player ' + (event.action === "register" ? 'registered' : 'logged in'), sessionHash: player.sessionHash, code: 'PG_RESPONSE_PLAYER_REGISTERED' };
+        response = {
+            info: 'Player ' + (event.action === "register" ? 'registered' : 'logged in'),
+            sessionHash: player.sessionHash,
+            code: 'PG_RESPONSE_PLAYER_REGISTERED' };
         context.succeed(response);
     }
 

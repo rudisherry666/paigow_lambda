@@ -11,7 +11,7 @@ define([], function() {
     return {
         mock: false,
 
-        mockCookie: '; pg-session-hash=session-hash-1',
+        mockCookie: '; X-PG-Session=session-hash-1',
 
         mockGames: [
             {

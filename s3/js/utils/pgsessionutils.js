@@ -1,10 +1,7 @@
 /*
+* @class pgsessionutils
 *
-* @class pgplayermodel
-*
-* This file defines the pgplayer js class on the client
-*
-* A single player corresponds to a person playing the game.
+* Utilities for managing the cookie-based session.
 */
 
 define([
@@ -17,6 +14,8 @@ define([
 
     var SESSION_HASH;
     return {
+        sesssionCookieName: 'X-PG-Session',
+
         addSessionHashHeader: function(options) {
             if (SESSION_HASH) {
                 options = options || {};
@@ -27,7 +26,7 @@ define([
         },
 
         initializeSessionHash: function() {
-            this.setSessionHash(browserUtils.getCookie('pg-session-hash'));
+            this.setSessionHash(browserUtils.getCookie(this.sesssionCookieName));
         },
 
         setSessionHash: function(sessionHash) {
@@ -36,9 +35,9 @@ define([
             if (sessionHash === "undefined") sessionHash = undefined;
             SESSION_HASH = sessionHash;
             if (SESSION_HASH) {
-                document.cookie = 'pg-session-hash=' + sessionHash;
+                document.cookie = this.sesssionCookieName + '=' + sessionHash;
             } else {
-                document.cookie = 'pg-session-hash=' + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+                document.cookie = this.sesssionCookieName + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
             }
         },
 
