@@ -12,10 +12,6 @@
     margin-right: 3px;
 }
 
-.pg-loser .pgtile {
-    background-color: #666;
-}
-
 .pg-push .pgtile {
     background-color: #444;
 }
@@ -36,6 +32,10 @@
     border-radius: 8px;
     position: absolute;
     display: none;
+}
+
+.pg-loser .pgdot {
+    opacity: 0.3;
 }
 
 .pg-deal-hidden-hands .pgdot {

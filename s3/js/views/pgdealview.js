@@ -20,6 +20,16 @@ define([
     PGHandView,
     template
 ) {
+
+    function switchResult(r) {
+        switch (r) {
+            case 'W': return 'L';
+            case 'L': return 'W';
+            case 'P': return 'P';
+            default:
+                throw new Exception("Bad win/lose/push result!");
+        }
+    }
     
     var PGDealView = PGBaseView.extend({
 
@@ -292,9 +302,19 @@ define([
             }
         },
 
+        _add2TileClass: function($pg2Tile, handPoint) {
+            var addedClass = '';
+            switch (handPoint) {
+                case 'W': addedClass = 'pg-winner'; break;
+                case 'L': addedClass = 'pg-loser'; break;
+                case 'P': addedClass = 'pg-push'; break;
+            }
+            $pg2Tile.addClass(addedClass);
+        },
+
         _allTilesAreSet: function() {
             var o = this._options,
-                tiles, ip, points;
+                tiles, ip, points, handpoints, handpoint, $pg2Tiles, $handPoint, winLoseClass;
 
             // The opponent's tile now become visible
             if (!o.isPlayer) {
@@ -307,17 +327,31 @@ define([
                 });
             }
 
-            // Do the scoring.
+            // Show the scoring: we check the individual hand points that
+            // show each hand (two tiles) as winner or loser: they'll be
+            // be 'WW' for player wins both, 'WL' for player wins high
+            // hand but loses low hand, etc. 'P' is push.
+            $pg2Tiles = this.$('.pg2tile');
             points = o.pgDealModel.get('points');
-            if (points) {
-                for (ip = 0; ip < 3; ip++) {
-                    var point = points[ip];
-                    if (point) {
-                        if (!o.isPlayer) point = -point;
-                        handPoint = this.$('.pg-handpoints-' + (3 - ip));
-                        handPoint.addClass(point > 0 ? 'pg-winner' : 'pg-loser');
-                    }
+            handpoints = o.pgDealModel.get('handpoints');
+            for (ip = 0; ip < 3; ip++) {
+                var point = points[ip], handpoint = handpoints[ip];
+                // Switch the points if we're not the payer
+                if (!o.isPlayer) {
+                  point = -point;
+                  handpoint = switchResult(handpoint[0]) + switchResult(handpoint[1]);
                 }
+                winLoseClass = point > 0 ? 'pg-winner' :
+                    (point < 0) ? 'pg-loser' : 'pg-push';
+
+                // Hilight a winning score number.
+                $handPoint = this.$('.pg-handpoints-' + (3 - ip));
+                $handPoint.addClass(winLoseClass);
+
+                // Make the two-tile the right class
+                // $($hands[ip]).addClass(winLoseClass);
+                this._add2TileClass($($pg2Tiles[ip*2]), handpoint[0]);
+                this._add2TileClass($($pg2Tiles[ip*2+1]), handpoint[1]);
             }
 
             this._setDealSituation('deal-done');
