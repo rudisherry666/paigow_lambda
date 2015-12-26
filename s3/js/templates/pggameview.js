@@ -1,10 +1,6 @@
 define([], function() {
     return {
         game:
-            '<link href="css/pgdeal.css" rel="stylesheet">' +
-            '<link href="css/pghand.css" rel="stylesheet">' +
-            '<link href="css/pgtile.css" rel="stylesheet">' +
-            '<link href="css/entypo.css" rel="stylesheet">' +
             '<div>' +
                 '<p class="pgscore">' +
                     '<span class="pg-player-name"><%= playerName %></span>: ' +
