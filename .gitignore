@@ -5,4 +5,6 @@ q.js
 test/node_modules/
 s3/view-templates/
 *.zip
-node_modules
+paigow_lambda/node_modules
+lambda-local
+
