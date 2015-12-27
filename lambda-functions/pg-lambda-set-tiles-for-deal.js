@@ -146,6 +146,9 @@ exports.handler = function(event, context) {
         // Computer is always the opponent.
         deal.situation.opponent = 'TILES_ARE_SET';
 
+        // In case the player has already set their tiles, score it.
+        deal = pg.addPointsToDeal(deal)
+
         return deal;
     }
 

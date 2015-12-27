@@ -41,7 +41,12 @@ exports.handler = function(event, context) {
                 error: 'No situation supplied for putting deal',
                 code: 'PG_ERROR_MISSING_SITUATION_PARAMETER'
             });
-        } else if (["tiles_are_set", "deal-done"].indexOf(event.situation) < 0) {
+        } else if (typeof event.situation !== 'string') {
+            defer.reject({
+                error: 'Non-string situation supplied for putting deal',
+                code: 'PG_ERROR_BAD_SITUATION_PARAMETER_TYPE'
+            });
+        } else if (["TILES_ARE_SET", "DEAL_DONE"].indexOf(event.situation) < 0) {
             defer.reject({
                 error: 'Bad situation supplied for putting deal',
                 code: 'PG_ERROR_BAD_SITUATION_PARAMETER'
@@ -141,7 +146,7 @@ exports.handler = function(event, context) {
             dbDeal.situation.player = 'TILES_ARE_SET';
             console.log('spliced tiles in');
             console.log(dbDeal);
-            deal = addPointsToDeal(dbDeal);
+            deal = pg.addPointsToDeal(dbDeal);
             return dbUtils.putItem(dynamodb, 'deal', deal);
         });
     }
@@ -198,9 +203,9 @@ exports.handler = function(event, context) {
         console.log(dbDeal);
 
         // Depending on the payload, we update the deal.
-        if (event.situation === 'tiles_are_set') {
+        if (event.situation === 'TILES_ARE_SET') {
             return setTiles(dbDeal);
-        } else if (event.situation === 'deal-done') {
+        } else if (event.situation === 'DEAL_DONE') {
             return addAnotherDeal(dbDeal);
         }
     })

@@ -186,11 +186,13 @@ define([
             var o = this._options,
                 tileIndexes = o.pgHandViews.reduce(function(prev, cur) {
                     return prev.concat(cur.tileIndexes());
-                }, []);
+                }, []),
+                curSituation = _.clone(o.pgDealModel.get('situation'));
 
+            curSituation.player = 'TILES_ARE_SET';
             o.pgDealModel.set({
                 tiles: tileIndexes,
-                situation: o.pgDealUIModel.get('situation')
+                situation: curSituation
             }).save({}, {
                 success: _.bind(function(model, response, options) {
                     // The tiles hav been updated, during 'save', with the
@@ -198,7 +200,6 @@ define([
                     // We know the opponent is ready because the deal's
                     // opponent's situation will be 'TILES_ARE_SET'.
                     var oSituation = model.get('situation').opponent;
-                    oSituation = 'TILES_NOT_SET';
                     switch (oSituation) {
                         case 'TILES_ARE_SET':
                             o.eventBus.trigger('deal:opponent_tiles_are_set');
@@ -272,7 +273,7 @@ define([
                             // 'sync' and we'll show and score that that time.
                             o.pgDealModel.fetch();
                         } else if (pgDealSituation.opponent === 'TILES_ARE_SET') {
-                            this._opponentTilesAreSet();
+                            o.eventBus.trigger('deal:opponent_tiles_are_set');
                         }
                     }, this),
                     error: _.bind(function(error) {
@@ -293,7 +294,6 @@ define([
                 d = o.pgDealModel,
                 tiles;
 
-            // Make sure we know they've set.
             this.$el.addClass('pg-hands-set');
 
             // If our tiles are set as well, then everything goes.
