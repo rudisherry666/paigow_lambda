@@ -8,7 +8,7 @@ body {
 
 .pg-divider {
   min-height: 10px;
-  min-width 1px;
+  min-width: 1px;
 }
 
 .container.pg {
@@ -20,6 +20,15 @@ body {
   margin: 0;
   min-width: 768px;
   transition: transform 1s;
+}
+
+.navbar .dropdown-menu .pg-menu-item {
+  margin-left: 10px;
+}
+
+.navbar .dropdown-menu .pg-menu-item-title {
+  color: gray;
+  pointer-events: none;
 }
 
 @media (max-width: 680px) {
