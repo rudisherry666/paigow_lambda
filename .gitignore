@@ -7,4 +7,4 @@ s3/view-templates/
 *.zip
 paigow_lambda/node_modules
 lambda-local
-
+lambda-functions/node_modules/underscore
