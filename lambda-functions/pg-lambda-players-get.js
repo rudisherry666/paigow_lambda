@@ -20,9 +20,7 @@ exports.handler = function(event, context) {
     validateRequest()
     .then(function(player) {
         dynamodb.scan({
-            TableName: 'player',
-            ExpressionAttributeValues: { ':playername': player.username },
-            FilterExpression: 'username <> :playername'
+            TableName: 'player'
         }, function(err, data) {
             if (err) {
                 console.log('Error trying to find players, error: ' + JSON.stringify(err));

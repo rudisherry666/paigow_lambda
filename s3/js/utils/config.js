@@ -13,6 +13,17 @@ define([], function() {
 
         mockCookie: '; X-PG-Session=session-hash-1',
 
+        mockPlayers: [
+            {
+                username: 'mock-1',
+                situation: 'LOGGED_OUT'
+            },
+            {
+                username: 'mock-2',
+                situation: 'LOGGED_IN'
+            },
+        ],
+
         mockGames: [
             {
                 gameHash: 'game-hash-4',

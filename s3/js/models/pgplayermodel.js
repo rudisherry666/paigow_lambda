@@ -17,12 +17,6 @@ define([
 
         // Startup
         initialize: function() {
-            // Assume the worst: we don't know.
-            this.set(this.defaults);
-
-            // Fetch: maybe it will change.
-            this.fetch();
-
             // When we've changed an we've synced,
             // then we're static again.
             this.on('sync', function() {

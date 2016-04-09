@@ -22,15 +22,6 @@ body {
   transition: transform 1s;
 }
 
-.navbar .dropdown-menu .pg-menu-item {
-  margin-left: 10px;
-}
-
-.navbar .dropdown-menu .pg-menu-item-title {
-  color: gray;
-  pointer-events: none;
-}
-
 @media (max-width: 680px) {
   .pggame.pg-game-making-room,
   .pggame.pg-game-comparing-hands,

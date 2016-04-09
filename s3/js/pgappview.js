@@ -10,10 +10,12 @@ define([
     'models/pgplayermodel',
     'views/pgplayernameview',
     'views/pgsigninview',
+    'views/pgopponentsmenuview',
     'models/pgsessionmodel',
     'models/pgdeckmodel',
     'models/pggamemodel',
     'models/pggamescollection',
+    'models/pgplayerscollection',
     'views/pggametableview',
     'views/pggameview'
 ], function(
@@ -21,10 +23,12 @@ define([
     PGPlayerModel,
     PGPlayerNameView,
     PGSigninView,
+    PGOpponentsMenuView,
     PGSessionModel,
     PGDeckModel,
     PGGameModel,
     PGGamesCollection,
+    PGPlayersCollection,
     PGGameTableView,
     PGGameView
 ) {
@@ -77,7 +81,8 @@ define([
                 success: _.bind(function() {
                     var o = this._options;
 
-                    this._options.pgGamesCollection = new PGGamesCollection();
+                    o.pgGamesCollection = new PGGamesCollection();
+                    o.pgPlayersCollection = new PGPlayersCollection();
 
                     console.log('success getting player');
 
@@ -90,7 +95,7 @@ define([
                     if (!o.pgPlayerNameView) {
                         o.pgPlayerNameView = new PGPlayerNameView({
                             el: $('#pglayer-name-nav'),
-                            eventBus: this._options.eventBus,
+                            eventBus: o.eventBus,
                             pgPlayerModel: pModel,
                         });
                         o.pgPlayerNameView.render();
@@ -100,15 +105,28 @@ define([
                     if (!o.pgGameTableView) {
                         o.pgGameTableView = new PGGameTableView({
                             el: $('#pg-games-table-wrapper'),
-                            eventBus: this._options.eventBus,
-                            pgSessionModel: this._options.pgSessionModel,
-                            pgGamesCollection: this._options.pgGamesCollection
+                            eventBus: o.eventBus,
+                            pgSessionModel: o.pgSessionModel,
+                            pgGamesCollection: o.pgGamesCollection
                         });
                         o.pgGameTableView.render();
                     }
 
+                    // Populate the new-game menu with opponents
+                    if (!o.pgOpponentsMenuView) {
+                        o.pgOpponentsMenuView = new PGOpponentsMenuView({
+                            el: $('.pg-opponents-dropdown-ul'),
+                            eventBus: o.eventBus,
+                            pgSessionModel: o.pgSessionModel,
+                            pgPlayersCollection: o.pgPlayersCollection,
+                            pgPlayerModel: pModel,
+                        });
+                        o.pgOpponentsMenuView.render();
+                    }
+
                     // Now that we have a table, get the games.
-                    this._options.pgGamesCollection.fetch();
+                    o.pgGamesCollection.fetch();
+                    o.pgPlayersCollection.fetch();
 
                 }, this),
                 error: _.bind(function() {
@@ -137,6 +155,11 @@ define([
             if (o.pgGameTableView) {
                 o.pgGameTableView.remove();
                 delete o.pgGameTableView;
+            }
+
+            if (o.pgOpponentsMenuView) {
+                o.pgOpponentsMenuView.remove();
+                delete o.pgOpponentsmenuview;
             }
 
             // The sign-in view, only if we're not logged in.
