@@ -49,18 +49,13 @@ define([
 
         },
 
-        events: function() {
-            return {
-                'click #pg-new-game'   :   '_newGame'
-            };
-        },
-
         _addModelListeners: function() {
             var eBus = this._options.eventBus;
             this.listenTo(eBus, 'login', this._login);
             this.listenTo(eBus, 'logout', this._logout);
             this.listenTo(eBus, 'click:game', this._resumeGame);
             this.listenTo(eBus, 'click:opponent', this._clickOpponent);
+            this.listenTo(eBus, 'game:new', this._newGame);
 
             // Any button on the navbar removes the collapse.
             $(".collapse.navbar-collapse").click(function(e) {
@@ -205,7 +200,7 @@ define([
                 contentType: 'application/json',
                 url: this._options.pgSessionModel.urlRoot + '/game',
                 data: JSON.stringify({
-                    opponent: 'computer'
+                    opponent: e.opponent
                 }),
                 success: _.bind(function(data) {
                     var o = this._options;

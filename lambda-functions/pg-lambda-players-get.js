@@ -10,13 +10,13 @@ exports.handler = function(event, context) {
     console.log(event);
 
     dynamodb = dbUtils.getDynamoDB();
+    console.log(dynamodb);
 
     function validateRequest() {
         return dbUtils.validatePlayer(dynamodb, event.sessionHash);
     }
 
     // Actually do the work, now that all the functions have been created.
-    dynamodb = new (require('dynamodb-doc')).DynamoDB();
     validateRequest()
     .then(function(player) {
         dynamodb.scan({
