@@ -33,24 +33,28 @@ define([
             return this._super.apply(this, arguments);
         },
 
+        _addPlayer: function(playerName) {
+            var tmpl = _.template('<li class="pg-menu-item pg-opponent-name"><a class="pg-opponent-name-ref" href="#"><%= playerName %></a></li>'),
+                html = tmpl({ playerName: playerName }),
+                curPlayerRefs = this.$el.find('.pg-opponent-name-ref'),
+                cpi, inserted;
+            for (cpi = 0; cpi < curPlayerRefs.length; cpi++) {
+                var $menuPlayer = $(curPlayerRefs[cpi]);
+                if (playerName < $menuPlayer.text()) {
+                    $menuPlayer.parent().before(html);
+                    inserted = true;
+                    break;
+                }
+            }
+            if (!inserted) {
+                this.$el.append(html);
+            }
+        },
+
         _playerAdded: function(player) {
             var newPlayerName = player.get('username');
             if (newPlayerName !== this._options.pgPlayerModel.get('username')) {
-                var tmpl = _.template('<li class="pg-menu-item pg-opponent-name"><a class="pg-opponent-name-ref" href="#"><%= playerName %></a></li>'),
-                    html = tmpl({ playerName: player.get('username') }),
-                    curPlayerRefs = this.$el.find('.pg-opponent-name-ref'),
-                    cpi, inserted;
-                for (cpi = 0; cpi < curPlayerRefs.length; cpi++) {
-                    var $menuPlayer = $(curPlayerRefs[cpi]);
-                    if (newPlayerName < $menuPlayer.text()) {
-                        $menuPlayer.parent().before(html);
-                        inserted = true;
-                        break;
-                    }
-                }
-                if (!inserted) {
-                    this.$el.append(html);
-                }
+                this._addPlayer(newPlayerName);
             }
         },
 
@@ -61,7 +65,7 @@ define([
         _newGameAgainst: function(e) {
             var opponentName = $(e.target).html();
             console.log('New game against ' + opponentName);
-            this._options.eventBus.trigger('game:new', { opponent: opponentName });
+            this._options.eventBus.trigger('game:new', { opponent: opponentName.trim() });
         }
 
     });
