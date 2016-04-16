@@ -11,6 +11,10 @@
   cursor: pointer;
 }
 
+.navbar .dropdown-menu > li.pg-menu-item.pg-logged-in > a {
+  font-weight: bold;
+}
+
 .navbar .dropdown-menu .pg-menu-item-title {
   color: gray;
   pointer-events: none;

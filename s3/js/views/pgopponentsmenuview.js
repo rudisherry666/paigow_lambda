@@ -33,14 +33,17 @@ define([
             return this._super.apply(this, arguments);
         },
 
-        _addPlayer: function(playerName) {
-            var tmpl = _.template('<li class="pg-menu-item pg-opponent-name"><a class="pg-opponent-name-ref" href="#"><%= playerName %></a></li>'),
-                html = tmpl({ playerName: playerName }),
+        _addPlayer: function(player) {
+            var tmpl = _.template('<li class="pg-menu-item pg-opponent-name <%- situation %>"><a class="pg-opponent-name-ref" href="#"><%= playerName %></a></li>'),
+                html = tmpl({
+                    playerName: player.get('username'),
+                    situation: player.get('situation') === 'LOGGED_IN' ? 'pg-logged-in' : 'pg-logged-out'
+                }),
                 curPlayerRefs = this.$el.find('.pg-opponent-name-ref'),
                 cpi, inserted;
             for (cpi = 0; cpi < curPlayerRefs.length; cpi++) {
                 var $menuPlayer = $(curPlayerRefs[cpi]);
-                if (playerName < $menuPlayer.text()) {
+                if (player.get('username') < $menuPlayer.text()) {
                     $menuPlayer.parent().before(html);
                     inserted = true;
                     break;
@@ -54,7 +57,7 @@ define([
         _playerAdded: function(player) {
             var newPlayerName = player.get('username');
             if (newPlayerName !== this._options.pgPlayerModel.get('username')) {
-                this._addPlayer(newPlayerName);
+                this._addPlayer(player);
             }
         },
 
