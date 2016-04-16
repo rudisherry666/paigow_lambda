@@ -1,3 +1,11 @@
 .pg-game-in-progress .pg-games-table {
     display: none;
 }
+
+.pg-games-table {
+    border: 1px solid #ddd;
+}
+
+.pg-games-table h3 {
+    margin-left: 20px;
+}

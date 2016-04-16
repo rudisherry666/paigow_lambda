@@ -30,13 +30,13 @@ define([
             // When we've changed an we've synced,
             // then we're static again.
             this.on('sync', function() {
-                console.log('Games have been fetched!');
+                console.log('GamesCollection sync triggered.');
             });
         },
 
         parse: function(data) {
             var vals = this._super(data);
-            vals.unshift({gameHash: 'new-game'});
+            // vals.unshift({gameHash: 'new-game'});
             return vals;
         },
 
