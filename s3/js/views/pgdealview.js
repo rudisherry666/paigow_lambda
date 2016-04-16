@@ -21,14 +21,13 @@ define([
     template
 ) {
 
+    var PROPS = {
+        'W': { opponent: 'L', twoTileClass: 'pg-winner' },
+        'L': { opponent: 'W', twoTileClass: 'pg-loser' },
+        'P': { opponent: 'P', twoTileClass: 'pg-push' }
+    };
     function switchResult(r) {
-        switch (r) {
-            case 'W': return 'L';
-            case 'L': return 'W';
-            case 'P': return 'P';
-            default:
-                throw new Exception("Bad win/lose/push result!");
-        }
+        return PROPS[r].opponent;
     }
     
     var PGDealView = PGBaseView.extend({
@@ -195,6 +194,8 @@ define([
                 situation: curSituation
             }).save({}, {
                 success: _.bind(function(model, response, options) {
+                    console.log('Have set our tiles, getting situation');
+
                     // The tiles hav been updated, during 'save', with the
                     // actual opponent's tiles -- if the opponent is ready.
                     // We know the opponent is ready because the deal's
@@ -202,12 +203,14 @@ define([
                     var oSituation = model.get('situation').opponent;
                     switch (oSituation) {
                         case 'TILES_ARE_SET':
+                            console.log('Have set our tiles, opponent tiles also set, triggering event');
                             o.eventBus.trigger('deal:opponent_tiles_are_set');
                         break;
 
                         case 'DEAL_NOT_SEEN':
                         case 'TILES_NOT_SET':
                             // The opponent is still thinking.
+                            console.log('Have set our tiles, opponent still thinking');
                         break;
                     }
                 }, this),
@@ -271,8 +274,10 @@ define([
                             // opponent has set them: fetch the deal again to
                             // get the opponent's tile values.  It will trigger
                             // 'sync' and we'll show and score that that time.
+                            console.log('All tiles are set, getting deal');
                             o.pgDealModel.fetch();
                         } else if (pgDealSituation.opponent === 'TILES_ARE_SET') {
+                            console.log('Opponent tiles set but not ours, triggering event');
                             o.eventBus.trigger('deal:opponent_tiles_are_set');
                         }
                     }, this),
@@ -290,26 +295,11 @@ define([
         },
 
         _opponentTilesAreSet: function() {
-            var o = this._options,
-                d = o.pgDealModel,
-                tiles;
-
             this.$el.addClass('pg-hands-set');
-
-            // If our tiles are set as well, then everything goes.
-            if (d.get('situation').player === 'TILES_ARE_SET') {
-                o.eventBus.trigger('deal:all_tiles_are_set');
-            }
         },
 
         _add2TileClass: function($pg2Tile, handPoint) {
-            var addedClass = '';
-            switch (handPoint) {
-                case 'W': addedClass = 'pg-winner'; break;
-                case 'L': addedClass = 'pg-loser'; break;
-                case 'P': addedClass = 'pg-push'; break;
-            }
-            $pg2Tile.addClass(addedClass);
+            $pg2Tile.addClass(PROPS[handPoint].twoTileClass);
         },
 
         _allTilesAreSet: function() {
@@ -348,8 +338,8 @@ define([
                 $handPoint = this.$('.pg-handpoints-' + (3 - ip));
                 $handPoint.addClass(winLoseClass);
 
-                // Make the two-tile the right class
-                // $($hands[ip]).addClass(winLoseClass);
+                // Make the two-tile the right class: it shows which
+                // two-tile is the winner.
                 this._add2TileClass($($pg2Tiles[ip*2]), handpoint[0]);
                 this._add2TileClass($($pg2Tiles[ip*2+1]), handpoint[1]);
             }
