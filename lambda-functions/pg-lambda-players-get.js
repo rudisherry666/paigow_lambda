@@ -36,15 +36,32 @@ exports.handler = function(event, context) {
                 });
             } else {
                 console.log(data);
-                var retVal = _.map(data.Items, function(onePlayer) {
-                    console.log(onePlayer);
-                    return {
-                        username: onePlayer.username,
-                        situation: onePlayer.situation
-                    };
+                var retValPromises = q.all(
+                    _.map(data.Items,
+                        function(onePlayer) {
+                            // Return an object of the player and its situation.
+                            return dbUtils.playerSituation(dynamodb, onePlayer)
+                            .then(function(situation) {
+                                return {
+                                    username: onePlayer.username,
+                                    situation: situation
+                                };
+                            });
+                        })
+                    );
+                console.log('Waiting for promises...');
+                retValPromises.then(function(retVal) {
+                    console.log('Promises all resolved!');
+                    console.log(retVal);
+                    context.succeed(retVal);
+                })
+                .fail(function(err) {
+                    console.log('fail, could not resolve all promises: ' + err);
+                    context.succeed({
+                        info: 'Internal all-promise error',
+                        code: 'PG_ERROR_PLAYER_SITUATION'
+                    });
                 });
-                console.log(retVal);
-                context.succeed(retVal);
             }
         });
     })
