@@ -137,7 +137,12 @@ define([
                 return this._showStatus("Passwords don't match!");
             }
 
-            this._signInOrRegister('registering', username, password);
+            var email = $("#pgsignin-register-email").val();
+            if (!email) {
+                return this._showStatus("Email is required!");
+            }
+
+            this._signInOrRegister('registering', username, password, email);
         },
 
         _showStatus: function(err) {
@@ -154,7 +159,7 @@ define([
             return $body.hasClass('signing-in');
         },
 
-        _signInOrRegister: function(state, username, password) {
+        _signInOrRegister: function(state, username, password, email) {
             var isRegister = state === 'registering',
                 promise,
                 sModel = this._options.pgSessionModel,
@@ -165,7 +170,8 @@ define([
             pModel.set({
                 state: state,
                 username: username,
-                password: password
+                password: password,
+                email: email || ''
             });
 
             if (isRegister) {

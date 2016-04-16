@@ -89,9 +89,8 @@ define([
         register: function(playerModel) {
             var defer = $.Deferred(),
                 data = _.extend(
-                    _.pick(playerModel.attributes, 'username', 'password'), {
-                    action: 'register',
-                    email: 'rudisherry666@gmail.com'
+                    _.pick(playerModel.attributes, 'username', 'password', 'email'), {
+                    action: 'register'
                 }),
                 ajaxOptions = {
                     url: this.urlRoot + '/register',

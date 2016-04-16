@@ -19,7 +19,8 @@ define([], function() {
                 '<div class="tab-pane" id="register"> '+
                     '<input id="pgsignin-register-name" type="text" class="pgsignin-input input-block-level" placeholder="Choose a username"> '+
                     '<input id="pgsignin-register-password" type="password" class="pgsignin-input input-block-level" placeholder="Choose a password"> '+
-                    '<input id="pgsignin-register-password-verify" type="password" class="ipgsignin-input nput-block-level" placeholder="Verify password"> '+
+                    '<input id="pgsignin-register-password-verify" type="password" class="pgsignin-input input-block-level" placeholder="Verify password"> '+
+                    '<input id="pgsignin-register-email" type="text" class="pgsignin-input input-block-level" placeholder="Your email address"> '+
                     '<label class="checkbox"> '+
                         '<input id="pgsignin-register-rememberme" type="checkbox" value="remember-me"> Remember me '+
                     '</label> '+
