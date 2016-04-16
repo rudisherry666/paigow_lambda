@@ -4,6 +4,7 @@ docs
 q.js
 test/node_modules/
 s3/view-templates/
+misc/
 *.zip
 paigow_lambda/node_modules
 lambda-local
