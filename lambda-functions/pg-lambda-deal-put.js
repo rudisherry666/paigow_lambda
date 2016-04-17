@@ -153,18 +153,13 @@ exports.handler = function(event, context) {
 
     function addAnotherDeal() {
         var defer = q.defer();
-        
-        dbDeal.situation = "DONE";
+
+        // Create the deal.        
+        deal = pg.newDeal(event.gameHash, event.dealIndex + 1);
+        console.log(deal);
+
+        // This goes in several steps.
         dbUtils.putItem(dynamodb, 'deal', deal)
-        .then(function() {
-            console.log('Deal is done, creating new deal');
-            deal = pg.newDeal(event.gameHash, event.dealIndex + 1);
-
-            // This goes in several steps.
-            console.log(deal);
-
-            return dbUtils.putItem(dynamodb, 'deal', deal);
-        })
         .then(function() {
             console.log('New deal is saved, updating game');
             return dbUtils.getItem(dynamodb, 'game', 'gameHash', event.gameHash);
