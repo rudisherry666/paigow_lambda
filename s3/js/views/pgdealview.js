@@ -249,6 +249,7 @@ define([
                 case 'TILES_ARE_SET':
                     if (s.opponent === 'TILES_ARE_SET') {
                         this._setDealSituation('deal-done');
+                        o.eventBus.trigger('deal:all_tiles_are_set');
                     } else {
                         this._setDealSituation('tiles_are_set');
                     }
