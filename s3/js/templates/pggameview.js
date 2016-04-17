@@ -1,13 +1,13 @@
 define([], function() {
     return {
+        score:
+            '<span class="pg-player-name"><%= playerName %></span>: ' +
+            '<span class="pg-player-score"><%= playerScore %></span> ' +
+            '<span class="pg-opponent-name"><%= opponentName %></span>: ' +
+            '<span class="pg-opponent-score"><%= opponentScore %></span>',
         game:
             '<div>' +
-                '<p class="pgscore">' +
-                    '<span class="pg-player-name"><%= playerName %></span>: ' +
-                    '<span class="pg-player-score"><%= playerScore %></span> ' +
-                    '<span class="pg-opponent-name"><%= opponentName %></span>: ' +
-                    '<span class="pg-opponent-score"><%= opponentScore %></span>' +
-                '</p>' +
+                '<p class="pg-score"></p>' +
             '</div>' +
             '<div class="pgdeal pg-deal-player"></div>' +
             '<div class="pgdeal pg-deal-opponent"></div>',
