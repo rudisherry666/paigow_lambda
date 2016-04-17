@@ -152,6 +152,10 @@ define([
                         this._addScores();
                     }, this), 2000);
                 break;
+
+                case situations.SCORE_ADDED:
+                    this.$el.addClass('pg-game-comparing-hands');
+                break;
             }
         },
 
@@ -164,17 +168,20 @@ define([
 
         _onNextDeal: function() {
             var o = this._options,
+                g = o.pgGameModel,
                 gui = o.pgGameUIModel,
                 situations = gui.situations,
                 d = o.pgDealModel;
             gui.set('situation', situations.NEW_DEAL_ASKED_FOR);
             o.pgDealModel.set('dealID',
-                pgGameModel.get('gameHash') + '#' + (o.pgDealModel.get('dealID') + 1));
+                g.get('gameHash') + '#' + (o.pgDealModel.dealIndex() + 1));
         },
 
         _addScores: function() {
             var o = this._options,
                 g = o.pgGameModel,
+                gui = o.pgGameUIModel,
+                situations = gui.situations,
                 d = o.pgDealModel,
                 score = g.get('score').slice();
             _.each(d.get('points'), function (p) {
@@ -185,6 +192,7 @@ define([
                 }
             });
             g.set('score', score);
+            gui.set('situation', situations.SCORE_ADDED);
         },
     });
 
