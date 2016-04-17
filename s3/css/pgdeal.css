@@ -79,15 +79,6 @@
     opacity: 1;
 }
 
-.pg-game-making-room .pg-deal-opponent,
-.pg-game-setting-tiles .pg-deal-opponent,
-.pg-game-just-dealt .pg-deal-opponent {
-    width: 0;
-    height: 0;
-    opacity: 0;
-    overflow: hidden;
-}
-
 .pg-hidden-hand .pgswitchhands-btn,
 .pg-deal-opponent .pgswitchhands-btn
  {
@@ -106,4 +97,14 @@
     .pgdeal {
         margin-left: 1px;
     }
+
+    .pg-game-making-room .pg-deal-opponent,
+    .pg-game-setting-tiles .pg-deal-opponent,
+    .pg-game-just-dealt .pg-deal-opponent {
+        width: 0;
+        height: 0;
+        opacity: 0;
+        overflow: hidden;
+    }
+
 }
