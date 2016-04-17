@@ -41,10 +41,10 @@ define([
         _addModelListeners: function() {
             var o = this._options;
 
-            this.listenTo(o.pgDealModel, 'sync', this._show);
+            this.listenTo(o.pgDealModel, 'sync', this._showDeal);
             this.listenTo(o.pgGameUIModel, 'change:situation', this._onGameSituationChange);
-            this.listenTo(o.pgDealModel, 'change:points', this._onDealPointChange);
-            this.listenTo(o.pgGameModel, 'change:score', this._onScoreChange);
+            this.listenTo(o.eventBus, 'game:next-deal', this._onNextDeal);
+            this.listenTo(o.eventBus, 'deal:all_tiles_are_set', this._onTilesAreSet);
 
             return this._super();
         },
@@ -52,7 +52,6 @@ define([
         // Show the game
         _addChildElements: function() {
             var o = this._options,
-                $game = this.$el,
                 compiled = _.template(template.game),
                 oDeal = _.pick(o, 'eventBus', 'pgSessionModel',
                                   'pgGameModel', 'pgDealModel'),
@@ -71,7 +70,7 @@ define([
                         playerName: playerName,
                         opponent: opponent
                     },
-                    _.pick(o, 'eventBus', 'pgGameModel')));
+                    _.pick(o, 'eventBus', 'pgGameModel', 'pgDealModel')));
 
             this._dealViews = [
                 new PGDealView(_.extend({
@@ -112,34 +111,41 @@ define([
             return this._super();
         },
 
-        _show: function(model, deal) {
+        // The new deal is just sync'ed, now we have tiles and can show.
+        _showDeal: function(model, deal) {
+            var o = this._options,
+                gui = o.pgGameUIModel,
+                situations = gui.situations;
+
+            console.log('deal sync triggered');
+
             this._scoreView.render();
             _.each(this._dealViews, function(dealView) { dealView.render(); });
+
+            // TODO: better mechanism for figuring out that we just dealt;
+            // deal triggers 'sync' too often.
+            if (gui.get('situation') === situations.NEW_DEAL_ASKED_FOR) {
+                this._options.pgGameUIModel.set('situation', situations.JUST_DEALT);
+            }
         },
 
         _onGameSituationChange: function(model, newSituation) {
-            var o = this._options;
+            var o = this._options,
+                situations = o.pgGameUIModel.situations;
 
             // We're in "no" state now.
             this.$el.removeClass('pg-game-making-room pg-game-ready-for-next-deal pg-game-comparing-hands pg-game-dealing-tiles pg-game-setting-tiles');
 
             switch (newSituation) {
-                case states.READY_FOR_NEXT_DEAL:
-                    this.$el.addClass('pg-game-ready-for-next-deal');
-                    o.pgDealModel.set('dealID',
-                        pgGameModel.get('gameHash') + '#' + (o.pgDealModel.get('dealID') + 1));
-                break;
-
-                case states.JUST_DEALT:
+                case situations.JUST_DEALT:
                     this.$el.addClass('pg-game-setting-tiles');
                 break;
 
-                case states.NEW_DEAL_ASKED_FOR:
+                case situations.NEW_DEAL_ASKED_FOR:
                     this.$el.addClass('pg-game-dealing-tiles');
-                    this._newDeal();
                 break;
 
-                case states.SCORING:
+                case situations.SCORING:
                     this.$el.addClass('pg-game-making-room');
                     _.delay(_.bind(function() {
                         this.$el.addClass('pg-game-comparing-hands');
@@ -149,11 +155,28 @@ define([
             }
         },
 
+        _onTilesAreSet: function() {
+            var o = this._options,
+                gui = o.pgGameUIModel,
+                situations = gui.situations;
+            gui.set('situation', situations.SCORING);
+        },
+
+        _onNextDeal: function() {
+            var o = this._options,
+                gui = o.pgGameUIModel,
+                situations = gui.situations,
+                d = o.pgDealModel;
+            gui.set('situation', situations.NEW_DEAL_ASKED_FOR);
+            o.pgDealModel.set('dealID',
+                pgGameModel.get('gameHash') + '#' + (o.pgDealModel.get('dealID') + 1));
+        },
+
         _addScores: function() {
             var o = this._options,
                 g = o.pgGameModel,
                 d = o.pgDealModel,
-                score = g.get('score');
+                score = g.get('score').slice();
             _.each(d.get('points'), function (p) {
                 if (p < 0) {
                     score[1] -= p;
@@ -163,10 +186,6 @@ define([
             });
             g.set('score', score);
         },
-
-        _onScoreChange: function(model, newScore) {
-
-        }
     });
 
     return PGGameView;

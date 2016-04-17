@@ -101,7 +101,7 @@ define([
                 this.listenTo(o.pgDealUIModel, 'change:situation', this._onDealSituationChange);
                 this.listenTo(o.pgDealModel, 'sync', this._onDealSync);
                 this.listenTo(o.eventBus, 'deal:tiles_are_set', this._onTilesSet);
-
+                this.listenTo(o.eventBus, 'game:next-deal', this._onNextDeal);
                 // Start polling for the opponent's state.
                 _.delay(this._pollForSituation, 2000);
             } else {
@@ -135,7 +135,7 @@ define([
         },
 
         _nextDeal: function(e) {
-            this._setDealSituation('deal-done');
+            this._options.eventBus.trigger('game:next-deal');
         },
 
         _anotherGame: function(e) {
@@ -172,13 +172,22 @@ define([
                     o.eventBus.trigger('deal:deal-done');
                 break;
 
+                case 'next-deal':
+                    this._setClass('pg-deal-waiting');
+                    this.$el.addClass('pg-no-manipulate pg-deal-hidden-hands');
+                break;
+
                 case 'game-done':
                     this._setClass('pg-deal-game-done');
                     this.$el.addClass('pg-no-manipulate')
                             .removeClass('pg-deal-hidden-hands');
-                    o.eventBus.trigger('deal:game-done');
+                    o.eventBus.trigger('game:game-done');
                 break;
             }
+        },
+
+        _onNextDeal: function() {
+            this._setClass('next-deal');
         },
 
         _onTilesSet: function() {

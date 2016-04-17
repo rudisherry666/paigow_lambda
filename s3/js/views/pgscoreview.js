@@ -24,16 +24,31 @@ define([
         _addChildElements: function() {
             var compiled = _.template(template.score),
                 o = this._options,
-                score = o.pgGameModel.get('score');
+                score = this._score();
             this.$el.append(compiled({
                 playerName: o.amPlayer ? o.playerName : o.opponent,
                 opponentName: o.amPlayer ? o.opponent : o.playerName,
-                playerScore: score[o.amPlayer ? 0 : 1],
-                opponentScore: score[o.amPlayer ? 1 : 0],
+                playerScore: score[0],
+                opponentScore: score[1],
             }));
             return this._super.apply(this, arguments);
         },
 
+        _onScoreChange: function(model, newScore) {
+            var score = this._score();
+            this.$('.pg-player-score').text(score[0]);
+            this.$('.pg-opponent-score').text(score[1]);
+        },
+
+        _score: function() {
+            var o = this._options,
+                score = o.pgGameModel.get('score');
+            if (o.amPlayer) {
+                return score;
+            } else {
+                return [ score[1], score[0] ];
+            }
+        }
     });
 
     return PGScoreView;
