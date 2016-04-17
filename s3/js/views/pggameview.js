@@ -2,7 +2,7 @@
 *
 * @class PGGameView
 *
-* This file controls the overall page
+* This file controls the overall game content when playing a game
 */
 
 define([
@@ -11,6 +11,7 @@ define([
     'models/ui/pggameuimodel',
     'views/pgbaseview',
     'views/pgdealview',
+    'views/pgscoreview',
     'templates/pggameview'
 ], function(
     PGTile,
@@ -18,6 +19,7 @@ define([
     PGGameUIModel,
     PGBaseView,
     PGDealView,
+    PGScoreView,
     template
 ) {
 
@@ -29,7 +31,7 @@ define([
             o.pgGameUIModel = new PGGameUIModel({ eventBus: o.eventBus });
             o.pgDealModel = new PGDealModel({
                 eventBus: o.eventBus,
-                situation: 'thinking'
+                situation: 'thinking',
             });
 
             return this._super();
@@ -41,11 +43,13 @@ define([
 
             this.listenTo(o.pgDealModel, 'sync', this._show);
             this.listenTo(o.pgGameUIModel, 'change:situation', this._onGameSituationChange);
+            this.listenTo(o.pgDealModel, 'change:points', this._onDealPointChange);
+            this.listenTo(o.pgGameModel, 'change:score', this._onScoreChange);
 
             return this._super();
         },
 
-        // If there is no signin, then show the view.
+        // Show the game
         _addChildElements: function() {
             var o = this._options,
                 $game = this.$el,
@@ -58,12 +62,16 @@ define([
                 amPlayer = g.get('players').indexOf(playerName) === 0,
                 score = g.get('score');
 
-            this.$el.append(compiled({
-                playerName: playerName,
-                opponentName: opponent,
-                playerScore: amPlayer ? score[0] : score[1],
-                opponentScore: amPlayer ? score[1] : score[0]
-            }));
+            this.$el.append(compiled());
+
+            this._scoreView = new PGScoreView(
+                _.extend({
+                        el: this.$('.pg-score'),
+                        amPlayer: amPlayer,
+                        playerName: playerName,
+                        opponent: opponent
+                    },
+                    _.pick(o, 'eventBus', 'pgGameModel')));
 
             this._dealViews = [
                 new PGDealView(_.extend({
@@ -105,10 +113,12 @@ define([
         },
 
         _show: function(model, deal) {
+            this._scoreView.render();
             _.each(this._dealViews, function(dealView) { dealView.render(); });
         },
 
         _onGameSituationChange: function(model, newSituation) {
+            var o = this._options;
 
             // We're in "no" state now.
             this.$el.removeClass('pg-game-making-room pg-game-ready-for-next-deal pg-game-comparing-hands pg-game-dealing-tiles pg-game-setting-tiles');
@@ -116,6 +126,8 @@ define([
             switch (newSituation) {
                 case states.READY_FOR_NEXT_DEAL:
                     this.$el.addClass('pg-game-ready-for-next-deal');
+                    o.pgDealModel.set('dealID',
+                        pgGameModel.get('gameHash') + '#' + (o.pgDealModel.get('dealID') + 1));
                 break;
 
                 case states.JUST_DEALT:
@@ -131,9 +143,29 @@ define([
                     this.$el.addClass('pg-game-making-room');
                     _.delay(_.bind(function() {
                         this.$el.addClass('pg-game-comparing-hands');
+                        this._addScores();
                     }, this), 2000);
                 break;
             }
+        },
+
+        _addScores: function() {
+            var o = this._options,
+                g = o.pgGameModel,
+                d = o.pgDealModel,
+                score = g.get('score');
+            _.each(d.get('points'), function (p) {
+                if (p < 0) {
+                    score[1] -= p;
+                } else if (p > 0) {
+                    score[0] += p;
+                }
+            });
+            g.set('score', score);
+        },
+
+        _onScoreChange: function(model, newScore) {
+
         }
     });
 

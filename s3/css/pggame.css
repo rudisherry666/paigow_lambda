@@ -1,18 +1,18 @@
-.pgscore {
+.pg-score {
   font-size: 24px;
   font-weight: 200;
   margin-bottom: 3px;
   margin-left: 40px;
 }
 
-.pg-game-comparing-hands .pgscore,
-.pg-game-ready-for-deal .pgscore {
+.pg-game-comparing-hands .pg-score,
+.pg-game-ready-for-deal .pg-score {
   margin-left: 0;
   text-align: center;
 }
 
 @media (max-width: 560px) {
-  .pgscore {
+  .pg-score {
     font-size: 16px;
   }
 }
