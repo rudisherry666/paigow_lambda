@@ -17,6 +17,8 @@ define([
 
     var PGSessionModel = PGBaseModel.extend({
 
+        modelName: 'PGSessionModel',
+
         // Startup
         initialize: function() {
             // Assume the worst: we don't know.

@@ -16,6 +16,8 @@ function(
     
     var PGDeckModel = Backbone.Model.extend({
 
+        modelName: 'PGDeckModel',
+
         // Startup
         initialize: function() {
             this.set(this.defaults);

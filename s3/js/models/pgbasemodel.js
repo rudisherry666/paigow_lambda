@@ -25,7 +25,16 @@ define([
             this._addModelListeners();
         },
 
-        _addModelListeners: function() {}
+        _addModelListeners: function() {},
+
+        parse: function(data) {
+            if (!data) {
+                console.log('ERROR: got no data from fetching!');
+            } else if (data.errorMessage) {
+                console.log('ERROR: error returned from server for ' + this.modelName + ': ' + data.errorMessage);
+            }
+            return this._super.apply(this, arguments);
+        }
 
     });
 

@@ -18,6 +18,8 @@ function(
     
     var PGGameModel = PGBaseModel.extend({
 
+        modelName: 'PGGameModel',
+
         // Startup
         initialize: function(options) {
 

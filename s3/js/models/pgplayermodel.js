@@ -15,6 +15,8 @@ define([
     
     var PGPlayerModel = PGBaseModel.extend({
 
+        modelName: 'PGPlayerModel',
+
         // Startup
         initialize: function() {
             // When we've changed an we've synced,

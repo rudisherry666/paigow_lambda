@@ -16,6 +16,8 @@ function(
     
     var PGDealModel = PGBaseModel.extend({
 
+        modelName: 'PGDealModel',
+
         defaults: {
             'dealID': null
         },
