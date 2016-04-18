@@ -1,6 +1,7 @@
 var q = require('q'),
     utils = require('general-utils'),
     dbUtils = require('db-utils'),
+    gameUtils = require('game-utils'),
     pg = require('pg'),
     aws = require('aws-sdk'),
     dynamodb, session;
@@ -66,15 +67,12 @@ exports.handler = function(event, context) {
             lastDealIndex: 0
         };
         console.log(pg);
-        deal = pg.newDeal(game.gameHash,  0);
-        console.log('deal: ');
-        console.log(deal);
-        return q.all([
-            dbUtils.putItem(dynamodb, 'deal', deal),
-            dbUtils.putItem(dynamodb, 'game', game)
-        ]);
+        return gameUtils.createNewDeal(dynamodb, game, 0);
     })
-    .then(function() {
+    .then(function(savedDeal) {
+        console.log('Deal and game saved, adding game to session');
+        deal = savedDeal;
+
         // Game and deal have been created.  Put that info into the session.
         session.gameHash = game.gameHash;
         return dbUtils.putItem(dynamodb, 'session', session);
@@ -82,47 +80,20 @@ exports.handler = function(event, context) {
     .then(function() {
         var defer = q.defer();
 
-        console.log('setting if we have to set tiles for opponent: ' + event.opponent);
+        console.log('seeing if we have to set tiles for opponent: ' + event.opponent);
 
         // If we're playing against the computer, it needs to set its tiles.
         if (event.opponent !== 'computer') return true;
 
-        console.log('seting tiles for opponent: ' + event.opponent);
-        var lambda = new aws.Lambda();
-        console.log('added lambda: ' + lambda);
-        var params = {
-            FunctionName: 'pg-lambda-set-tiles-for-deal',
-            // ClientContext: 'STRING_VALUE',
-            InvocationType: 'Event', // 'Event | RequestResponse | DryRun',
-            LogType: 'None', // 'None | Tail',
-            Payload: // new Buffer('...') || 'STRING_VALUE',
-                JSON.stringify({
-                    sessionHash: event.sessionHash,
-                    dealID: deal.dealID
-                })
-            // Qualifier: 'STRING_VALUE'
-        };
-        console.log('created params:');
-        console.log(params);
-        lambda.invoke(params, function(err, data) {
-            if (err) {
-                console.log('Lambda error:');
-                console.log(err, err.stack); // an error occurred
-                defer.resolve();    // TODO: wtf do we do here?
-            } else {
-                console.log('Lambda success:');
-                console.log(data);           // successful response
-                defer.resolve();
-            }
-        });
-
-        return defer.promise;
+        return gameUtils.haveComputerSetTiles(event.sessionHash, event.opponent, deal);
     })
     .then(function() {
+        console.log('SUCCESS: { gameHash: ' + game.gameHash + '}');
         // All success! Return the game ID.
         context.succeed({ gameHash: game.gameHash });
     })
     .fail(function(err) {
+        console.log('FAIL: ' + err);
         // TODO: if writing some stuff failled, we have to back out.
         // i.e. make it transaction based.
         context.succeed(err);
